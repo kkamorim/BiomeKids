@@ -1,4 +1,4 @@
-# 🦁 ZooKids — Exploradores da Natureza
+# 🦁 BiomeKids — Exploradores da Natureza
 
 > **Aplicativo mobile educativo e gamificado para o ensino lúdico de fauna, biomas e preservação ambiental para o público infantil.**
 
