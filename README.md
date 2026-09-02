@@ -6,7 +6,7 @@
 
 ## 🌿 Sobre o Projeto
 
-O **ZooKids** é um aplicativo mobile desenvolvido para conectar crianças ao universo dos animais e da natureza de forma divertida, interativa e segura. 
+O **BiomeKids** é um aplicativo mobile desenvolvido para conectar crianças ao universo dos animais e da natureza de forma divertida, interativa e segura. 
 
 Através de uma interface visual rica e intuitiva, as crianças exploram diferentes territórios, descobrem espécies animais, aprendem sobre hábitos alimentares e habitats, e testam seus conhecimentos com quizzes e desafios educativos.
 
