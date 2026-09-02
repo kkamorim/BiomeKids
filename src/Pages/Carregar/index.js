@@ -28,7 +28,7 @@ export default function Carregar() {
     // Anima a barra de progresso do início até 100%
     const animation = Animated.timing(progress, {
       toValue: 1,
-      duration: 3200,
+      duration: 4000,
       easing: Easing.bezier(0.25, 0.1, 0.25, 1),
       useNativeDriver: false,
     });

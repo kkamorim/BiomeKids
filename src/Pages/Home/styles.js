@@ -49,6 +49,7 @@ export default StyleSheet.create({
     flex: 1,
     width: '100%',
     alignItems: 'center',
+    marginBottom:100,
   },
 
   btnEntrar: {

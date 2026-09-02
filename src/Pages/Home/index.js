@@ -4,6 +4,7 @@ import {
   Text,
   Image,
   Pressable,
+  ImageBackground,
 } from 'react-native';
 import styles from './styles';
 import { useNavigation } from '@react-navigation/native';
@@ -44,7 +45,11 @@ export default function Home() {
 
   return (
 
-    <View style={styles.container}>
+    <ImageBackground
+      style={styles.container}
+      source={require('../../../assets/fundo-selva.png')}
+      resizeMode="cover"
+    >
 
       <View style={styles.placaContainer}>
         <Image
@@ -70,13 +75,13 @@ export default function Home() {
 
         <Pressable
           style={styles.btnCadastro}
-          onPress={() => navigation.navigate('Conta')}
+          onPress={() => navigation.navigate('Cadastro')}
         >
           <Text style={styles.btnCadastroText}><Ionicons name="globe-outline" size={20} color="#FFF" /> Criar Conta</Text>
         </Pressable>
       </View>
 
       <StatusBar style="auto" />
-    </View>
+    </ImageBackground>
   );
 }

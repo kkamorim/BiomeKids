@@ -5,7 +5,7 @@ import { Image } from 'react-native';
 
 import Carregar from './src/Pages/Carregar';
 import Home from './src/Pages/Home';
-import Conta from './src/Pages/Conta';
+import Cadastro from './src/Pages/Cadastro';
 import Entrar from './src/Pages/Entrar';
 import Territorio from './src/Pages/Territorio';
 import Territorio1 from './src/Pages/Territorio1';
@@ -50,13 +50,14 @@ export default function App() {
 
 
         <Stack.Screen 
-          name='Conta' 
-          component={Conta}
+          name='Cadastro' 
+          component={Cadastro}
           options={{
             headerTitleAlign:"center",
             title: 'Criar Conta',
-            headerStyle: { backgroundColor: '#584737' },
-            headerTintColor: 'white',
+            headerStyle: { backgroundColor: '#fff' },
+            headerTintColor: 'black',
+            headerShadowVisible: false,
           }} 
         />
 
@@ -66,8 +67,9 @@ export default function App() {
           options={{
             headerTitleAlign:"center",
             title: 'Entrar',
-            headerStyle: { backgroundColor: '#584737' },
-            headerTintColor: 'white',
+            headerStyle: { backgroundColor: '#fff' },
+            headerTintColor: 'black',
+            headerShadowVisible: false,
           }} 
         />
 
