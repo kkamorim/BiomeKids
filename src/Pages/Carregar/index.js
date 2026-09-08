@@ -15,6 +15,8 @@ import styles from './styles';
 
 import { useAuth } from '../../contexts/AuthContext';
 
+const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
+
 export default function Carregar() {
   const navigation = useNavigation();
   const { checkAuth } = useAuth();
@@ -42,7 +44,7 @@ export default function Carregar() {
         // Pausa de 350ms com a barra cheia para sensação de conclusão
         setTimeout(() => {
           if (isLogged) {
-            navigation.replace('Territorio');
+            navigation.replace('Mapa');
           } else {
             navigation.replace('Home');
           }
@@ -82,13 +84,12 @@ export default function Carregar() {
 
         {/* Barra de carregamento estilizada */}
         <View style={styles.progressBarTrack}>
-          <Animated.View style={[styles.progressBarFill, { width: progressWidth }]}>
-            <LinearGradient
-              colors={['#b8f13b', '#8ad81f', '#5cb311']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-              style={styles.gradientFill}
-            />
+          <AnimatedLinearGradient
+            colors={['#b8f13b', '#7ecb19', '#4ca810']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[styles.progressBarFill, { width: progressWidth }]}
+          >
             {/* Brilho superior estilizado */}
             <View style={styles.glossHighlight} />
 
@@ -96,7 +97,7 @@ export default function Carregar() {
             <View style={styles.pawContainer}>
               <FontAwesome5 name="paw" size={17} color="#ffffff" style={styles.pawIcon} />
             </View>
-          </Animated.View>
+          </AnimatedLinearGradient>
         </View>
       </View>
 

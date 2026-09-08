@@ -43,10 +43,10 @@ export default StyleSheet.create({
     width: '90%',
     maxWidth: 340,
     height: 32,
-    backgroundColor: '#351605',
+    backgroundColor: '#1b3813',
     borderRadius: 18,
     borderWidth: 2.5,
-    borderColor: '#e5ab47',
+    borderColor: '#7ecb19',
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -57,6 +57,7 @@ export default StyleSheet.create({
 
   progressBarFill: {
     height: '100%',
+    backgroundColor: '#47a51b',
     borderRadius: 15,
     overflow: 'hidden',
     flexDirection: 'row',

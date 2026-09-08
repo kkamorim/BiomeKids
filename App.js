@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Image } from 'react-native';     
+import { Platform } from 'react-native';     
+import * as NavigationBar from 'expo-navigation-bar';
 
 import Carregar from './src/Pages/Carregar';
-import Home from './src/Pages/Home';
+import Home from './src/Pages/Home'; 
 import Cadastro from './src/Pages/Cadastro';
 import Entrar from './src/Pages/Entrar';
-import Territorio from './src/Pages/Territorio';
+import Mapa from './src/Pages/Mapa';
 import Territorio1 from './src/Pages/Territorio1';
 import Territorio2 from './src/Pages/Territorio2';
 import Territorio3 from './src/Pages/Territorio3';
@@ -20,6 +21,15 @@ import { AuthProvider } from './src/contexts/AuthContext';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      // Oculta os botões virtuais do sistema (Voltar, Home, Janelas)
+      NavigationBar.setVisibilityAsync('hidden');
+      // Modo imersivo: ao deslizar da borda, aparece translúcido e se esconde sozinho sem empurrar o app
+      NavigationBar.setBehaviorAsync('overlay-swipe');
+    }
+  }, []);
+
   return (
     <AuthProvider>
       <NavigationContainer>
@@ -42,6 +52,7 @@ export default function App() {
             title:'Bem-Vindo',
             headerStyle: { backgroundColor: '#fff'},
             headerTintColor: 'black',
+            headerShown:false,
             headerShadowVisible: false,
             width:"100%",
             flex:1, 
@@ -74,13 +85,10 @@ export default function App() {
         />
 
         <Stack.Screen 
-          name='Territorio' 
-          component={Territorio}
+          name='Mapa' 
+          component={Mapa}
           options={{
-            headerTitleAlign:"center",
-            title: 'Territórios',
-            headerStyle: { backgroundColor: '#584737' },
-            headerTintColor: 'white',
+            headerShown: false,
           }} 
         />
 

@@ -185,7 +185,13 @@ export default function Conta() {
     setIsLoading(false);
 
     if (result.success) {
-      navigation.replace('Territorio');
+      Alert.alert(
+        'Conta Criada com Sucesso!',
+        'Sua conta de escoteiro foi criada. Bem-vindo à expedição!',
+        [
+          { text: 'OK', onPress: () => navigation.replace('Mapa') }
+        ]
+      );
     } else {
       Alert.alert('Erro no Cadastro', result.error);
     }

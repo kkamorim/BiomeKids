@@ -50,6 +50,12 @@ export default function Home() {
       source={require('../../../assets/fundo-selva.png')}
       resizeMode="cover"
     >
+      <Pressable
+        style={styles.circleWoodBtn}
+        onPress={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home')}
+      >
+        <Ionicons name="arrow-back" size={22} color="#ffe8b8" />
+      </Pressable>
 
       <View style={styles.placaContainer}>
         <Image

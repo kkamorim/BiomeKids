@@ -24,9 +24,9 @@ export default StyleSheet.create({
   },
 
   placa: {
-    width: 200,
+    width: 240,
     height: 160,
-    marginBottom: 10,
+    marginBottom:20,
   },
 
   tittle: {
