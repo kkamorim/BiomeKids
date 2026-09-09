@@ -9,13 +9,46 @@ export default StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: 0,
+  },
+
+  headerContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    paddingTop: 6,
+  },
+
+  voltarBtnContainer: {
+    position: 'absolute',
+    left:20,
+    zIndex: 10,
+  },
+
+  circleWoodBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#733e14',
+    borderWidth: 2.5,
+    borderColor: '#d4883b',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 3,
   },
 
   scrollContent: {
     alignItems: 'center',
     paddingVertical: 30,
+    width: '100%',
     paddingBottom: 60,
+    backgroundColor: 'transparent',
   },
 
   placaContainer: {
@@ -30,12 +63,22 @@ export default StyleSheet.create({
   },
 
   tittle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#42240c',
+    textAlign: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+
+  subtittle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#42240c',
     textAlign: 'center',
-    marginBottom: 10,
-    paddingHorizontal: 10,
+    marginBottom: 20,
+    paddingHorizontal: 20,
+    marginTop: 20,
   },
 
   form: {

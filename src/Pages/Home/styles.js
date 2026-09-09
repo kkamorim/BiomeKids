@@ -11,25 +11,10 @@ export default StyleSheet.create({
     padding: 20,
   },
 
-   circleWoodBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#733e14',
-    borderWidth: 2.5,
-    borderColor: '#d4883b',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 3,
-  },
-
   placaContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop:"5%",
   },
 
   placa: {

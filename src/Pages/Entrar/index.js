@@ -48,11 +48,24 @@ export default function Entrar() {
   return (
     <ImageBackground
       style={styles.container}
-      source={require('../../../assets/fundo-selva.png')}
+      source={require('../../../assets/fundo-selva2.png')}
       resizeMode="cover"
     >
 
+      <View style={styles.headerContainer}>
+        {/* Botão Voltar */}
+        <View style={styles.voltarBtnContainer}>
+          <Pressable
+            style={styles.circleWoodBtn}
+            onPress={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home')}
+          >
+            <Ionicons name="arrow-back" size={22} color="#ffe8b8" />
+          </Pressable>
+        </View>
+      
+
       <View style={styles.placaContainer}>
+
         <Image
           style={styles.placa}
           source={require('../../../assets/placa-biomekids.png')}
@@ -60,7 +73,10 @@ export default function Entrar() {
         />
       </View>
 
-      <Text style={styles.tittle}>Digite seus dados de escoteiro para continuar explorando.</Text>
+      </View>
+
+      <Text style={styles.tittle}>Entrar</Text>
+      <Text style={styles.subtittle}>Digite seus dados de escoteiro para continuar explorando.</Text>
 
       <View style={styles.form}>
         <Text style={styles.text}><Ionicons name="mail-outline" size={20} color="#666" style={styles.icon} /> Email:</Text>
@@ -118,6 +134,7 @@ export default function Entrar() {
         </Pressable>
       </View>
       <StatusBar style="auto" />
+      
     </ImageBackground>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
   View,
@@ -11,9 +11,9 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
-import * as NavigationBar from 'expo-navigation-bar';
+import { NavigationBar } from 'expo-navigation-bar';
 import styles from './styles';
 
 export default function Mapa() {
@@ -21,10 +21,17 @@ export default function Mapa() {
 
   useEffect(() => {
     if (Platform.OS === 'android') {
-      NavigationBar.setVisibilityAsync('hidden');
-      NavigationBar.setBehaviorAsync('overlay-swipe');
+      NavigationBar.setHidden(true);
     }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS === 'android') {
+        NavigationBar.setHidden(true);
+      }
+    }, [])
+  );
 
   // 1. Array de Dados dos Biomas (com status liberado/bloqueado, rotas e requisitos de missões)
   const biomas = [
@@ -57,7 +64,7 @@ export default function Mapa() {
       nome: 'CAATINGA',
       liberado: false,
       // Placeholder enquanto você adiciona o Caatinga.png aos assets
-      imagem: require('../../../assets/Pantanal.png'),
+      imagem: require('../../../assets/Caatinga.png'),
       requisito: 'Complete missões no Cerrado',
       rota: 'Territorio4',
     },
@@ -66,7 +73,7 @@ export default function Mapa() {
       nome: 'MATA ATLÂNTICA',
       liberado: false,
       // Placeholder enquanto você adiciona o MataAtlantica.png aos assets
-      imagem: require('../../../assets/Amazonia.png'),
+      imagem: require('../../../assets/MataAtlantica.png'),
       requisito: 'Complete missões na Amazônia',
       rota: 'Territorio5',
     },
@@ -75,7 +82,7 @@ export default function Mapa() {
       nome: 'PAMPA',
       liberado: false,
       // Placeholder enquanto você adiciona o Pampa.png aos assets
-      imagem: require('../../../assets/Cerrado.png'),
+      imagem: require('../../../assets/Pampa.png'),
       requisito: 'Complete missões no Cerrado',
       rota: 'Territorio6',
     },
@@ -115,25 +122,31 @@ export default function Mapa() {
 
         {/* Placa de Identificação */}
         {item.liberado ? (
-          <View style={styles.placaLiberada}>
+          <ImageBackground 
+            source={require('../../../assets/placa-pedra.png')}
+            style={styles.placaLiberada}
+            resizeMode="stretch"
+          >
             <Text style={styles.tituloLiberado}>{item.nome}</Text>
             <View style={styles.badgeLiberado}>
               <Text style={styles.textoBadgeLiberado}>Liberado</Text>
               <Ionicons name="checkmark-circle" size={15} color="#85e036" style={styles.badgeIcon} />
             </View>
-          </View>
+          </ImageBackground>
         ) : (
-          <View style={styles.placaBloqueada}>
+          <ImageBackground 
+            source={require('../../../assets/placa-pedra.png')}
+            style={styles.placaBloqueada}
+            imageStyle={{ opacity: 0.85 }}
+            resizeMode="stretch"
+          >
             <Text style={styles.tituloBloqueado}>{item.nome}</Text>
             <View style={styles.bloqueadoInfoRow}>
               <Text style={styles.requisitoTexto} numberOfLines={2}>
-                {item.requisito}
+                🔒 {item.requisito}
               </Text>
-              <View style={styles.cadeadoCircle}>
-                <Ionicons name="lock-closed" size={13} color="#dbe2ea" />
-              </View>
             </View>
-          </View>
+          </ImageBackground>
         )}
       </Pressable>
     );
@@ -178,6 +191,8 @@ export default function Mapa() {
       style={styles.container}
       resizeMode="cover"
     >
+      {/* Mantém a barra de navegação do Android sempre oculta */}
+      <NavigationBar hidden={true} />
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         {/* FlatList em Grid de 2 Colunas */}
         <FlatList

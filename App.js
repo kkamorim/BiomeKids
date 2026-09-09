@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Platform } from 'react-native';     
-import * as NavigationBar from 'expo-navigation-bar';
+import { NavigationBar } from 'expo-navigation-bar';
 
 import Carregar from './src/Pages/Carregar';
 import Home from './src/Pages/Home'; 
@@ -23,18 +23,16 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   useEffect(() => {
     if (Platform.OS === 'android') {
-      // Oculta os botões virtuais do sistema (Voltar, Home, Janelas)
-      NavigationBar.setVisibilityAsync('hidden');
-      // Modo imersivo: ao deslizar da borda, aparece translúcido e se esconde sozinho sem empurrar o app
-      NavigationBar.setBehaviorAsync('overlay-swipe');
+      // Oculta os botões virtuais do sistema
+      NavigationBar.setHidden(true);
     }
   }, []);
 
   return (
     <AuthProvider>
+      <NavigationBar hidden={true} />
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Carregar">
-
         
         <Stack.Screen 
           name='Carregar'
@@ -69,6 +67,7 @@ export default function App() {
             headerStyle: { backgroundColor: '#fff' },
             headerTintColor: 'black',
             headerShadowVisible: false,
+            headerShown:false,
           }} 
         />
 
@@ -81,6 +80,7 @@ export default function App() {
             headerStyle: { backgroundColor: '#fff' },
             headerTintColor: 'black',
             headerShadowVisible: false,
+            headerShown:false,
           }} 
         />
 

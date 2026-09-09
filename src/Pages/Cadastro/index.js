@@ -203,7 +203,7 @@ export default function Conta() {
   return (
     <ImageBackground
       style={styles.container}
-      source={require('../../../assets/fundo-selva.png')}
+      source={require('../../../assets/fundo-selva2.png')}
       resizeMode="cover"
     >
       <KeyboardAvoidingView
@@ -217,16 +217,31 @@ export default function Conta() {
           keyboardShouldPersistTaps="handled"
         >
 
-          {/* ── Placa BiomeKids ── */}
-          <View style={styles.placaContainer}>
-            <Image
-              style={styles.placa}
-              source={require('../../../assets/placa-biomekids.png')}
-              resizeMode="contain"
-            />
+          <View style={styles.headerContainer}>
+            {/* Botão Voltar */}
+            <View style={styles.voltarBtnContainer}>
+              <Pressable
+                style={styles.circleWoodBtn}
+                onPress={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home')}
+              >
+                <Ionicons name="arrow-back" size={22} color="#ffe8b8" />
+              </Pressable>
+            </View>
+
+
+            <View style={styles.placaContainer}>
+
+              <Image
+                style={styles.placa}
+                source={require('../../../assets/placa-biomekids.png')}
+                resizeMode="contain"
+              />
+            </View>
+
           </View>
 
-          <Text style={styles.tittle}>
+          <Text style={styles.tittle}>Crie sua conta</Text>
+          <Text style={styles.subtittle}>
             Crie sua conta de escoteiro e comece sua expedição pelos biomas!
           </Text>
 
@@ -462,32 +477,32 @@ export default function Conta() {
 
               <Text style={styles.modalSubSection}>1. Aceitação dos Termos</Text>
               <Text style={styles.modalText}>
-                Ao acessar, baixar ou utilizar o aplicativo BiomeKids/ZooKids ("Aplicativo"), você declara ter lido, 
-                compreendido e concordado integralmente com estes Termos de Uso. Caso não concorde com qualquer 
-                disposição aqui prevista, não utilize o Aplicativo. O uso continuado do Aplicativo após eventuais 
+                Ao acessar, baixar ou utilizar o aplicativo BiomeKids/ZooKids ("Aplicativo"), você declara ter lido,
+                compreendido e concordado integralmente com estes Termos de Uso. Caso não concorde com qualquer
+                disposição aqui prevista, não utilize o Aplicativo. O uso continuado do Aplicativo após eventuais
                 alterações nestes Termos constitui aceitação das modificações.
               </Text>
 
               <Text style={styles.modalSubSection}>2. Descrição do Serviço</Text>
               <Text style={styles.modalText}>
-                O BiomeKids/ZooKids é um aplicativo educativo voltado ao público infantil e juvenil, cujo objetivo é 
-                promover o aprendizado sobre biomas, ecossistemas e espécies animais por meio de atividades interativas, 
-                gamificação e conteúdo pedagógico. O Aplicativo não substitui o ensino formal e tem caráter complementar 
+                O BiomeKids/ZooKids é um aplicativo educativo voltado ao público infantil e juvenil, cujo objetivo é
+                promover o aprendizado sobre biomas, ecossistemas e espécies animais por meio de atividades interativas,
+                gamificação e conteúdo pedagógico. O Aplicativo não substitui o ensino formal e tem caráter complementar
                 e recreativo.
               </Text>
 
               <Text style={styles.modalSubSection}>3. Elegibilidade e Cadastro</Text>
               <Text style={styles.modalText}>
-                Para utilizar o Aplicativo, é necessário realizar cadastro fornecendo informações verídicas e 
-                atualizadas. Menores de 18 (dezoito) anos devem ter autorização de seu responsável legal para 
-                cadastro e uso do Aplicativo, conforme o Art. 14 da Lei Geral de Proteção de Dados (LGPD) e o 
-                Estatuto da Criança e do Adolescente (ECA — Lei nº 8.069/1990). O usuário é integralmente 
+                Para utilizar o Aplicativo, é necessário realizar cadastro fornecendo informações verídicas e
+                atualizadas. Menores de 18 (dezoito) anos devem ter autorização de seu responsável legal para
+                cadastro e uso do Aplicativo, conforme o Art. 14 da Lei Geral de Proteção de Dados (LGPD) e o
+                Estatuto da Criança e do Adolescente (ECA — Lei nº 8.069/1990). O usuário é integralmente
                 responsável por manter a confidencialidade de suas credenciais de acesso (e-mail e senha).
               </Text>
 
               <Text style={styles.modalSubSection}>4. Uso Aceitável</Text>
               <Text style={styles.modalText}>
-                O usuário compromete-se a utilizar o Aplicativo de forma ética, legal e em conformidade com estes 
+                O usuário compromete-se a utilizar o Aplicativo de forma ética, legal e em conformidade com estes
                 Termos. É expressamente proibido:{'\n'}
                 • Utilizar o Aplicativo para fins ilícitos, fraudulentos ou não autorizados;{'\n'}
                 • Tentar acessar áreas restritas, manipular dados ou comprometer a segurança do sistema;{'\n'}
@@ -499,11 +514,11 @@ export default function Conta() {
 
               <Text style={styles.modalSubSection}>5. Propriedade Intelectual</Text>
               <Text style={styles.modalText}>
-                Todo o conteúdo disponível no Aplicativo — incluindo, mas não se limitando a, textos, imagens, 
-                ilustrações, ícones, logotipos, marcas (BiomeKids™, ZooKids™), sons, código-fonte e design de 
-                interface — é de propriedade exclusiva da empresa desenvolvedora ou de seus licenciadores, 
-                protegido pela legislação brasileira de direitos autorais (Lei nº 9.610/1998) e propriedade 
-                industrial (Lei nº 9.279/1996). É vedada qualquer reprodução, total ou parcial, sem autorização 
+                Todo o conteúdo disponível no Aplicativo — incluindo, mas não se limitando a, textos, imagens,
+                ilustrações, ícones, logotipos, marcas (BiomeKids™, ZooKids™), sons, código-fonte e design de
+                interface — é de propriedade exclusiva da empresa desenvolvedora ou de seus licenciadores,
+                protegido pela legislação brasileira de direitos autorais (Lei nº 9.610/1998) e propriedade
+                industrial (Lei nº 9.279/1996). É vedada qualquer reprodução, total ou parcial, sem autorização
                 expressa e por escrito.
               </Text>
 
@@ -511,46 +526,46 @@ export default function Conta() {
               <Text style={styles.modalText}>
                 A empresa desenvolvedora NÃO se responsabiliza por:{'\n'}
                 • Ações, decisões ou comportamentos do usuário fora do ambiente do Aplicativo;{'\n'}
-                • Danos diretos, indiretos, incidentais, consequenciais ou punitivos decorrentes do uso ou 
-                  impossibilidade de uso do Aplicativo;{'\n'}
+                • Danos diretos, indiretos, incidentais, consequenciais ou punitivos decorrentes do uso ou
+                impossibilidade de uso do Aplicativo;{'\n'}
                 • Conteúdo gerado, compartilhado ou interpretado por terceiros;{'\n'}
-                • Falhas técnicas, interrupções de serviço, ataques cibernéticos ou eventos de força maior 
-                  que possam afetar a disponibilidade do Aplicativo;{'\n'}
+                • Falhas técnicas, interrupções de serviço, ataques cibernéticos ou eventos de força maior
+                que possam afetar a disponibilidade do Aplicativo;{'\n'}
                 • Interações entre usuários fora do Aplicativo;{'\n'}
                 • Uso indevido das informações educativas fornecidas como se fossem aconselhamento profissional;{'\n'}
-                • Quaisquer perdas ou danos resultantes de acesso não autorizado à conta do usuário por falha 
-                  em manter a segurança de suas credenciais.
+                • Quaisquer perdas ou danos resultantes de acesso não autorizado à conta do usuário por falha
+                em manter a segurança de suas credenciais.
               </Text>
 
               <Text style={styles.modalSubSection}>7. Isenção de Garantias</Text>
               <Text style={styles.modalText}>
-                O Aplicativo é fornecido "como está" ("as is") e "conforme disponível" ("as available"), sem 
-                garantias de qualquer natureza, expressas ou implícitas, incluindo, mas não se limitando a, 
-                garantias de comercialização, adequação a um fim particular, continuidade ou ausência de erros. 
-                A empresa desenvolvedora envidará esforços razoáveis para manter o Aplicativo funcional e 
+                O Aplicativo é fornecido "como está" ("as is") e "conforme disponível" ("as available"), sem
+                garantias de qualquer natureza, expressas ou implícitas, incluindo, mas não se limitando a,
+                garantias de comercialização, adequação a um fim particular, continuidade ou ausência de erros.
+                A empresa desenvolvedora envidará esforços razoáveis para manter o Aplicativo funcional e
                 atualizado, mas não garante disponibilidade ininterrupta.
               </Text>
 
               <Text style={styles.modalSubSection}>8. Modificações nos Termos</Text>
               <Text style={styles.modalText}>
-                A empresa desenvolvedora reserva-se o direito de alterar estes Termos de Uso a qualquer momento, 
-                mediante notificação prévia por meio do Aplicativo ou por e-mail. A continuidade do uso após a 
-                notificação será considerada como aceitação dos novos termos. Em caso de alterações substanciais, 
+                A empresa desenvolvedora reserva-se o direito de alterar estes Termos de Uso a qualquer momento,
+                mediante notificação prévia por meio do Aplicativo ou por e-mail. A continuidade do uso após a
+                notificação será considerada como aceitação dos novos termos. Em caso de alterações substanciais,
                 poderá ser solicitado novo consentimento expresso.
               </Text>
 
               <Text style={styles.modalSubSection}>9. Suspensão e Rescisão</Text>
               <Text style={styles.modalText}>
-                A empresa desenvolvedora poderá, a seu exclusivo critério, suspender ou encerrar a conta de 
-                qualquer usuário que viole estes Termos, sem necessidade de aviso prévio e sem prejuízo de 
-                outras medidas cabíveis. O usuário pode solicitar a exclusão de sua conta a qualquer momento, 
+                A empresa desenvolvedora poderá, a seu exclusivo critério, suspender ou encerrar a conta de
+                qualquer usuário que viole estes Termos, sem necessidade de aviso prévio e sem prejuízo de
+                outras medidas cabíveis. O usuário pode solicitar a exclusão de sua conta a qualquer momento,
                 conforme descrito na Política de Privacidade.
               </Text>
 
               <Text style={styles.modalSubSection}>10. Legislação Aplicável e Foro</Text>
               <Text style={styles.modalText}>
-                Estes Termos são regidos pelas leis da República Federativa do Brasil. Para dirimir quaisquer 
-                controvérsias decorrentes destes Termos, fica eleito o foro da Comarca do domicílio do usuário, 
+                Estes Termos são regidos pelas leis da República Federativa do Brasil. Para dirimir quaisquer
+                controvérsias decorrentes destes Termos, fica eleito o foro da Comarca do domicílio do usuário,
                 conforme previsto no Código de Defesa do Consumidor (Lei nº 8.078/1990, Art. 101, I).
               </Text>
 
@@ -562,8 +577,8 @@ export default function Conta() {
 
               <Text style={styles.modalSection}>🔒 POLÍTICA DE PRIVACIDADE</Text>
               <Text style={styles.modalText}>
-                Esta Política de Privacidade descreve como coletamos, usamos, armazenamos e protegemos seus dados 
-                pessoais, em conformidade com a Lei Geral de Proteção de Dados Pessoais (LGPD — Lei nº 13.709/2018) 
+                Esta Política de Privacidade descreve como coletamos, usamos, armazenamos e protegemos seus dados
+                pessoais, em conformidade com a Lei Geral de Proteção de Dados Pessoais (LGPD — Lei nº 13.709/2018)
                 e demais legislações aplicáveis.
               </Text>
 
@@ -581,7 +596,7 @@ export default function Conta() {
 
               <Text style={styles.modalSubSection}>2. Base Legal para o Tratamento</Text>
               <Text style={styles.modalText}>
-                O tratamento dos seus dados pessoais é realizado com base nas seguintes hipóteses legais 
+                O tratamento dos seus dados pessoais é realizado com base nas seguintes hipóteses legais
                 previstas no Art. 7º da LGPD:{'\n'}
                 • Consentimento do titular (Art. 7º, I) — fornecido no momento do cadastro;{'\n'}
                 • Execução de contrato (Art. 7º, V) — necessário para prestação do serviço;{'\n'}
@@ -601,24 +616,24 @@ export default function Conta() {
 
               <Text style={styles.modalSubSection}>4. Compartilhamento de Dados</Text>
               <Text style={styles.modalText}>
-                Seus dados pessoais NÃO serão vendidos, alugados ou cedidos a terceiros para fins comerciais. 
+                Seus dados pessoais NÃO serão vendidos, alugados ou cedidos a terceiros para fins comerciais.
                 O compartilhamento poderá ocorrer exclusivamente nas seguintes hipóteses:{'\n'}
-                • Com prestadores de serviços essenciais (hospedagem, infraestrutura) que atuam como operadores, 
-                  sob obrigações contratuais de confidencialidade e segurança;{'\n'}
+                • Com prestadores de serviços essenciais (hospedagem, infraestrutura) que atuam como operadores,
+                sob obrigações contratuais de confidencialidade e segurança;{'\n'}
                 • Por determinação legal, judicial ou de autoridade competente;{'\n'}
                 • Para proteção dos direitos, propriedade ou segurança da empresa, dos usuários ou de terceiros.
               </Text>
 
               <Text style={styles.modalSubSection}>5. Armazenamento e Segurança</Text>
               <Text style={styles.modalText}>
-                Seus dados são armazenados em servidores seguros, protegidos por medidas técnicas e 
+                Seus dados são armazenados em servidores seguros, protegidos por medidas técnicas e
                 administrativas adequadas, incluindo:{'\n'}
                 • Criptografia de dados em trânsito (HTTPS/TLS) e em repouso;{'\n'}
                 • Controle de acesso restrito com autenticação multifator;{'\n'}
                 • Monitoramento contínuo contra acessos não autorizados;{'\n'}
                 • Backups regulares e plano de recuperação de desastres.{'\n\n'}
-                Os dados serão mantidos pelo período necessário ao cumprimento das finalidades descritas ou 
-                conforme exigido por obrigação legal. Após o término do tratamento, os dados serão eliminados 
+                Os dados serão mantidos pelo período necessário ao cumprimento das finalidades descritas ou
+                conforme exigido por obrigação legal. Após o término do tratamento, os dados serão eliminados
                 de forma segura, salvo obrigação legal de retenção.
               </Text>
 
@@ -639,25 +654,25 @@ export default function Conta() {
 
               <Text style={styles.modalSubSection}>7. Dados de Crianças e Adolescentes</Text>
               <Text style={styles.modalText}>
-                Em conformidade com o Art. 14 da LGPD e o Estatuto da Criança e do Adolescente (ECA), o tratamento 
-                de dados pessoais de crianças (menores de 12 anos) somente será realizado com consentimento 
-                específico e em destaque dado por pelo menos um dos pais ou pelo responsável legal. Para adolescentes 
-                (entre 12 e 18 anos), o tratamento observará o seu melhor interesse, conforme legislação aplicável. 
-                A empresa envidará esforços razoáveis para verificar que o consentimento foi dado pelo responsável 
+                Em conformidade com o Art. 14 da LGPD e o Estatuto da Criança e do Adolescente (ECA), o tratamento
+                de dados pessoais de crianças (menores de 12 anos) somente será realizado com consentimento
+                específico e em destaque dado por pelo menos um dos pais ou pelo responsável legal. Para adolescentes
+                (entre 12 e 18 anos), o tratamento observará o seu melhor interesse, conforme legislação aplicável.
+                A empresa envidará esforços razoáveis para verificar que o consentimento foi dado pelo responsável
                 legal, utilizando tecnologias disponíveis.
               </Text>
 
               <Text style={styles.modalSubSection}>8. Cookies e Tecnologias de Rastreamento</Text>
               <Text style={styles.modalText}>
-                O Aplicativo pode utilizar tecnologias de rastreamento (analytics, logs de uso) exclusivamente para 
-                fins de melhoria da experiência do usuário e análise de desempenho. Nenhuma tecnologia invasiva 
+                O Aplicativo pode utilizar tecnologias de rastreamento (analytics, logs de uso) exclusivamente para
+                fins de melhoria da experiência do usuário e análise de desempenho. Nenhuma tecnologia invasiva
                 de rastreamento é empregada e os dados coletados são anonimizados sempre que possível.
               </Text>
 
               <Text style={styles.modalSubSection}>9. Transferência Internacional de Dados</Text>
               <Text style={styles.modalText}>
-                Caso seus dados sejam armazenados ou processados em servidores localizados fora do Brasil, a 
-                transferência será realizada em conformidade com os Art. 33 a 36 da LGPD, garantindo nível 
+                Caso seus dados sejam armazenados ou processados em servidores localizados fora do Brasil, a
+                transferência será realizada em conformidade com os Art. 33 a 36 da LGPD, garantindo nível
                 adequado de proteção de dados pessoais.
               </Text>
 
@@ -674,21 +689,21 @@ export default function Conta() {
 
               <Text style={styles.modalSubSection}>Direito à Informação</Text>
               <Text style={styles.modalText}>
-                Disponibilizamos informações claras, precisas e acessíveis sobre os serviços oferecidos, 
+                Disponibilizamos informações claras, precisas e acessíveis sobre os serviços oferecidos,
                 suas características, funcionalidades e eventuais limitações, conforme Art. 6º, III do CDC.
               </Text>
 
               <Text style={styles.modalSubSection}>Proteção contra Práticas Abusivas</Text>
               <Text style={styles.modalText}>
-                Nos comprometemos a não adotar práticas consideradas abusivas pelo CDC, incluindo publicidade 
-                enganosa ou abusiva, especialmente voltada ao público infantil, em observância ao Art. 37 do CDC 
+                Nos comprometemos a não adotar práticas consideradas abusivas pelo CDC, incluindo publicidade
+                enganosa ou abusiva, especialmente voltada ao público infantil, em observância ao Art. 37 do CDC
                 e à Resolução nº 163/2014 do CONANDA.
               </Text>
 
               <Text style={styles.modalSubSection}>Canais de Atendimento</Text>
               <Text style={styles.modalText}>
-                Mantemos canais de atendimento acessíveis para dúvidas, reclamações e exercício de direitos. 
-                Em caso de problemas não resolvidos, o usuário pode recorrer aos órgãos de defesa do consumidor 
+                Mantemos canais de atendimento acessíveis para dúvidas, reclamações e exercício de direitos.
+                Em caso de problemas não resolvidos, o usuário pode recorrer aos órgãos de defesa do consumidor
                 (PROCON) ou à plataforma consumidor.gov.br.
               </Text>
 
@@ -700,7 +715,7 @@ export default function Conta() {
 
               <Text style={styles.modalSection}>📬 CONTATO</Text>
               <Text style={styles.modalText}>
-                Para exercer seus direitos, esclarecer dúvidas ou reportar incidentes relacionados à privacidade 
+                Para exercer seus direitos, esclarecer dúvidas ou reportar incidentes relacionados à privacidade
                 e proteção de dados, entre em contato com nosso Encarregado de Proteção de Dados (DPO):{'\n\n'}
                 📧 E-mail: BiomeKidsContato@gmail.com{'\n'}
                 🏢 Empresa: BiomeKids{'\n'}
@@ -711,7 +726,7 @@ export default function Conta() {
               <View style={styles.modalDivider} />
 
               <Text style={[styles.modalText, { textAlign: 'center', fontStyle: 'italic', color: '#888' }]}>
-                Ao criar sua conta, você confirma que leu, compreendeu e concorda com todos os termos 
+                Ao criar sua conta, você confirma que leu, compreendeu e concorda com todos os termos
                 e políticas acima descritos.
               </Text>
 
