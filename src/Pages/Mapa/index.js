@@ -33,7 +33,8 @@ export default function Mapa() {
     }, [])
   );
 
-  // 1. Array de Dados dos Biomas (com status liberado/bloqueado, rotas e requisitos de missões)
+  // 1. Array de Dados dos Biomas na ordem de progressão:
+  // Pantanal (inicial) -> Amazônia -> Cerrado -> Caatinga -> Mata Atlântica -> Pampa
   const biomas = [
     {
       id: '1',
@@ -56,7 +57,7 @@ export default function Mapa() {
       nome: 'CERRADO',
       liberado: false,
       imagem: require('../../../assets/Cerrado.png'),
-      requisito: 'Complete missões no Pantanal',
+      requisito: 'Complete missões na Amazônia',
       rota: 'Territorio3',
     },
     {
@@ -74,7 +75,7 @@ export default function Mapa() {
       liberado: false,
       // Placeholder enquanto você adiciona o MataAtlantica.png aos assets
       imagem: require('../../../assets/MataAtlantica.png'),
-      requisito: 'Complete missões na Amazônia',
+      requisito: 'Complete missões na Caatinga',
       rota: 'Territorio5',
     },
     {
@@ -83,7 +84,7 @@ export default function Mapa() {
       liberado: false,
       // Placeholder enquanto você adiciona o Pampa.png aos assets
       imagem: require('../../../assets/Pampa.png'),
-      requisito: 'Complete missões no Cerrado',
+      requisito: 'Complete missões na Mata Atlântica',
       rota: 'Territorio6',
     },
   ];
@@ -111,43 +112,40 @@ export default function Mapa() {
         style={styles.cardContainer}
         onPress={() => handlePressBioma(item)}
       >
-        {/* Ilha Flutuante */}
+        {/* Ilha Flutuante (com sobreposição e cadeado cinza se bloqueado) */}
         <View style={styles.ilhaWrapper}>
           <Image
             source={item.imagem}
-            style={styles.ilhaImagem}
+            style={[
+              styles.ilhaImagem,
+              !item.liberado && styles.ilhaBloqueadaImagem,
+            ]}
             resizeMode="contain"
           />
         </View>
 
-        {/* Placa de Identificação */}
-        {item.liberado ? (
-          <ImageBackground 
-            source={require('../../../assets/placa-pedra.png')}
-            style={styles.placaLiberada}
-            resizeMode="stretch"
-          >
-            <Text style={styles.tituloLiberado}>{item.nome}</Text>
-            <View style={styles.badgeLiberado}>
-              <Text style={styles.textoBadgeLiberado}>Liberado</Text>
-              <Ionicons name="checkmark-circle" size={15} color="#85e036" style={styles.badgeIcon} />
+        {/* Placa de Identificação com Nome Centralizado */}
+        <ImageBackground 
+          source={require('../../../assets/placa-pedra.png')}
+          style={item.liberado ? styles.placaLiberada : styles.placaBloqueada}
+          imageStyle={!item.liberado ? { opacity: 0.85 } : undefined}
+          resizeMode="stretch"
+        >
+          {!item.liberado && (
+            <View style={styles.overlayBloqueado}>
+              <View style={styles.cadeadoCircle}>
+                <Ionicons name="lock-closed" size={22} color="#e2e8f0" />
+              </View>
             </View>
-          </ImageBackground>
-        ) : (
-          <ImageBackground 
-            source={require('../../../assets/placa-pedra.png')}
-            style={styles.placaBloqueada}
-            imageStyle={{ opacity: 0.85 }}
-            resizeMode="stretch"
+          )}
+          <Text 
+            style={item.liberado ? styles.tituloLiberado : styles.tituloBloqueado}
+            numberOfLines={1}
+            adjustsFontSizeToFit
           >
-            <Text style={styles.tituloBloqueado}>{item.nome}</Text>
-            <View style={styles.bloqueadoInfoRow}>
-              <Text style={styles.requisitoTexto} numberOfLines={2}>
-                🔒 {item.requisito}
-              </Text>
-            </View>
-          </ImageBackground>
-        )}
+            {item.nome}
+          </Text>
+        </ImageBackground>
       </Pressable>
     );
   };
@@ -161,7 +159,7 @@ export default function Mapa() {
           style={styles.circleWoodBtn}
           onPress={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home')}
         >
-          <Ionicons name="arrow-back" size={22} color="#ffe8b8" />
+          <Ionicons name="exit-outline" size={22} color="#ffe8b8" />
         </Pressable>
 
         {/* Placa Central de Madeira "MAPA" */}
@@ -176,7 +174,7 @@ export default function Mapa() {
           style={styles.diaryBtnWrapper}
           onPress={() => Alert.alert('Diário de Expedição', 'Em breve: seu diário e conquistas dos biomas!')}
         >
-          <View style={styles.circleWoodBtn}>
+          <View style={styles.circleWoodBtnDiary}>
             <Ionicons name="book" size={20} color="#ffe8b8" />
           </View>
           <Text style={styles.diaryBtnLabel}>Diário</Text>
