@@ -44,7 +44,7 @@ export default function Carregar() {
         // Pausa de 350ms com a barra cheia para sensação de conclusão
         setTimeout(() => {
           if (isLogged) {
-            navigation.replace('Mapa');
+            navigation.replace('Biomas');
           } else {
             navigation.replace('Home');
           }

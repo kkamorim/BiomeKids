@@ -38,8 +38,8 @@ export default function Entrar() {
     setIsLoading(false);
 
     if (result.success) {
-      // Login bem-sucedido -> navega direto para o Mapa
-      navigation.replace('Mapa');
+      // Login bem-sucedido -> navega direto para Biomas
+      navigation.replace('Biomas');
     } else {
       Alert.alert('Erro no Login', result.error);
     }

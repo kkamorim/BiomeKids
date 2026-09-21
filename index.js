@@ -1,3 +1,11 @@
+// Polyfill essencial para compatibilidade do Three.js no React Native (evita erro de process.emitWarning no Hermes/JSC)
+if (typeof process === 'undefined') {
+  global.process = {};
+}
+if (typeof process.emitWarning !== 'function') {
+  process.emitWarning = () => {};
+}
+
 import { registerRootComponent } from 'expo';
 
 import App from './App';

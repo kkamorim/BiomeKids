@@ -59,7 +59,6 @@ export default function Home() {
         />
       </View>
 
-
       <View style={styles.containerText}>
         <Text style={styles.tittle}>Preparado para a Expedição Escoteiro?</Text>
         <Text style={styles.subtittle}>Estude os animais, fotografe a natureza e desbloqueie biomas incríveis para o seu mapa.</Text>
