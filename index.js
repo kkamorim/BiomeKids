@@ -1,14 +1,15 @@
 // Polyfill essencial para compatibilidade do Three.js no React Native (evita erro de process.emitWarning no Hermes/JSC)
-if (typeof process === 'undefined') {
-  global.process = {};
+if (typeof globalThis.process === 'undefined') {
+  globalThis.process = {};
 }
-if (typeof process.emitWarning !== 'function') {
-  process.emitWarning = () => {};
+if (typeof globalThis.process.emitWarning !== 'function') {
+  globalThis.process.emitWarning = () => {};
 }
 
-import { registerRootComponent } from 'expo';
-
-import App from './App';
+// `require` e intencional aqui: imports estaticos sao avaliados antes do
+// polyfill e o Three.js pode acessar process.emitWarning durante o bootstrap.
+const { registerRootComponent } = require('expo');
+const App = require('./App').default;
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);
 // It also ensures that whether you load the app in Expo Go or in a native build,

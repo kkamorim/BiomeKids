@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   Pressable,
   Modal,
-  ScrollView,
   StatusBar,
   Alert,
 } from 'react-native';
@@ -12,8 +11,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
+import IsometricCanvas from '../../components/IsometricMap/IsometricCanvas';
 import IsometricBiomeDiorama from '../../components/IsometricMap/IsometricBiomeDiorama';
-import { BIOMES_CONFIG, getBiomeConfig } from '../../components/IsometricMap/BiomeConfig';
+import { getBiomeConfig } from '../../components/IsometricMap/BiomeConfig';
 import CurrencyHeader from '../../components/CurrencyHeader';
 import BottomNavBar from '../../components/BottomNavBar';
 import { useGame } from '../../contexts/GameContext';
@@ -26,8 +26,12 @@ export default function BiomeMapScreen() {
 
   // Bioma ativo (recebido por parâmetro ou padrão Pantanal)
   const initialBiomeKey = route.params?.biomeId || route.params?.biomaNome || 'pantanal';
-  const [selectedBiomeKey, setSelectedBiomeKey] = useState(initialBiomeKey);
-  const currentBiome = getBiomeConfig(selectedBiomeKey);
+  const currentBiome = getBiomeConfig(initialBiomeKey);
+  const [is3DReady, setIs3DReady] = useState(false);
+
+  useEffect(() => {
+    setIs3DReady(false);
+  }, [initialBiomeKey]);
 
   // Lista dinâmica de entidades adicionadas no diorama pelo jogador
   const [customEntities, setCustomEntities] = useState([]);
@@ -35,6 +39,7 @@ export default function BiomeMapScreen() {
   // Modo Edição / Construção ativo
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedPlot, setSelectedPlot] = useState(null);
+  const [selectedCoord, setSelectedCoord] = useState(null);
 
   // Modal de Cuidados do Animal
   const [selectedAnimal, setSelectedAnimal] = useState(null);
@@ -42,9 +47,6 @@ export default function BiomeMapScreen() {
 
   // Modal de Informação de Estrutura
   const [selectedStructure, setSelectedStructure] = useState(null);
-
-  // Modal Seletor de Biomas
-  const [biomePickerVisible, setBiomePickerVisible] = useState(false);
 
   // 1. Clique em animal (abre modal de cuidados)
   const handleAnimalPress = (animal) => {
@@ -60,6 +62,25 @@ export default function BiomeMapScreen() {
   // 3. Clique em lote de construção
   const handlePlotPress = (plot) => {
     setSelectedPlot(plot);
+    if (plot.position) setSelectedCoord(plot.position);
+  };
+
+  const handleTilePress = (position) => {
+    if (!isEditMode) return;
+
+    handlePlotPress({
+      id: `free_${position[0]}_${position[2]}`,
+      label: 'Lote selecionado',
+      position,
+    });
+  };
+
+  const handleEntityPress = (entity) => {
+    if (entity.type === 'animal') {
+      handleAnimalPress(entity);
+    } else if (entity.type === 'structure') {
+      handleStructurePress(entity);
+    }
   };
 
   // 4. Ações de cuidados com o animal
@@ -104,10 +125,12 @@ export default function BiomeMapScreen() {
       name: name,
       x: selectedPlot.x,
       y: selectedPlot.y,
+      position: selectedPlot.position,
     };
 
     setCustomEntities((prev) => [...prev, newEntity]);
     setSelectedPlot(null);
+    setSelectedCoord(null);
     Alert.alert('Sucesso! 🎉', `"${name}" foi adicionado com sucesso ao seu bioma!`);
   };
 
@@ -115,16 +138,32 @@ export default function BiomeMapScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
 
-      {/* CAMADA 1: DIORAMA ISOMÉTRICO 2.5D INTERATIVO */}
+      {/* CAMADA Z=0: CANVAS 3D ISOMÉTRICO */}
       <View style={styles.mapLayer}>
-        <IsometricBiomeDiorama
+        <IsometricCanvas
           biomeConfig={currentBiome}
           customEntities={customEntities}
           isEditMode={isEditMode}
-          onAnimalPress={handleAnimalPress}
-          onStructurePress={handleStructurePress}
+          onEntityPress={handleEntityPress}
           onPlotPress={handlePlotPress}
+          onTilePress={handleTilePress}
+          onReady={() => setIs3DReady(true)}
+          onError={() => setIs3DReady(false)}
+          selectedCoord={selectedCoord}
         />
+
+        {!is3DReady && (
+          <View style={styles.mapFallbackLayer}>
+            <IsometricBiomeDiorama
+              biomeConfig={currentBiome}
+              customEntities={customEntities}
+              isEditMode={isEditMode}
+              onAnimalPress={handleAnimalPress}
+              onStructurePress={handleStructurePress}
+              onPlotPress={handlePlotPress}
+            />
+          </View>
+        )}
       </View>
 
       {/* CAMADA 2: HUD NATIVO COM MOEDAS NO CANTO SUPERIOR DIREITO */}
@@ -139,17 +178,13 @@ export default function BiomeMapScreen() {
             <Ionicons name="arrow-back" size={24} color="#FFE8B8" />
           </Pressable>
 
-          {/* Badge Central do Bioma com Seletor */}
-          <Pressable
-            style={styles.biomeBadge}
-            onPress={() => setBiomePickerVisible(true)}
-          >
+          {/* O bioma é fixo nesta tela; a troca acontece na tela anterior. */}
+          <View style={styles.biomeBadge}>
             <Text style={styles.biomeBadgeIcon}>🌿</Text>
             <Text style={styles.biomeBadgeText} numberOfLines={1}>
               {currentBiome.nome}
             </Text>
-            <Ionicons name="chevron-down" size={16} color="#FFE8B8" />
-          </Pressable>
+          </View>
 
           {/* MOEDAS E DIAMANTES NO CANTO SUPERIOR DIREITO (Conforme solicitado!) */}
           <CurrencyHeader />
@@ -162,7 +197,6 @@ export default function BiomeMapScreen() {
           </Text>
         </View>
 
-        {/* BOTÃO FLUTUANTE DE MODO EDIÇÃO / CONSTRUÇÃO */}
         <Pressable
           style={[styles.editModeToggleBtn, isEditMode && styles.editModeToggleBtnActive]}
           onPress={() => setIsEditMode(!isEditMode)}
@@ -176,6 +210,7 @@ export default function BiomeMapScreen() {
             {isEditMode ? 'Concluir Edição' : 'Modo Construção'}
           </Text>
         </Pressable>
+
       </SafeAreaView>
 
       {/* MODAL 1: CUIDADOS COM O ANIMAL */}
@@ -325,55 +360,8 @@ export default function BiomeMapScreen() {
         </View>
       </Modal>
 
-      {/* MODAL 4: SELETOR DE BIOMAS */}
-      <Modal
-        visible={biomePickerVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setBiomePickerVisible(false)}
-      >
-        <View style={styles.modalBackdrop}>
-          <View style={styles.pickerContainer}>
-            <View style={styles.pickerHeader}>
-              <Text style={styles.pickerTitle}>🌍 Escolha o Bioma</Text>
-              <Pressable onPress={() => setBiomePickerVisible(false)}>
-                <Ionicons name="close-circle" size={24} color="#666" />
-              </Pressable>
-            </View>
-
-            <ScrollView style={styles.pickerScroll} showsVerticalScrollIndicator={false}>
-              {Object.keys(BIOMES_CONFIG).map((key) => {
-                const b = BIOMES_CONFIG[key];
-                const isSelected = selectedBiomeKey === key;
-                return (
-                  <Pressable
-                    key={key}
-                    style={[styles.pickerItem, isSelected && styles.pickerItemSelected]}
-                    onPress={() => {
-                      setSelectedBiomeKey(key);
-                      setBiomePickerVisible(false);
-                    }}
-                  >
-                    <View style={[styles.colorPreview, { backgroundColor: b.accentColor }]} />
-                    <View style={styles.pickerItemTextWrapper}>
-                      <Text style={[styles.pickerItemName, isSelected && styles.pickerItemNameSelected]}>
-                        {b.nome}
-                      </Text>
-                      <Text style={styles.pickerItemSub}>{b.subtitulo}</Text>
-                    </View>
-                    {isSelected && (
-                      <Ionicons name="checkmark-circle" size={22} color="#2D6A4F" />
-                    )}
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-
       {/* BARRA DE NAVEGAÇÃO INFERIOR DE MADEIRA FIXA NO RODAPÉ */}
-      <BottomNavBar activeTab="Mapa" />
+      <BottomNavBar activeTab="BiomeMap" />
     </View>
   );
 }

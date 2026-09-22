@@ -1,126 +1,190 @@
-import React, { Suspense, useState, useRef } from 'react';
-import { View, StyleSheet, PanResponder } from 'react-native';
+// @refresh reset
+import React, { Component, useMemo } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { Canvas } from '@react-three/fiber/native';
-import IsometricCamera from './IsometricCamera';
+
 import BiomeBlock from './BiomeBlock';
+import IsometricCamera from './IsometricCamera';
 import PlacedEntity from './PlacedEntity';
 
-/**
- * IsometricCanvas.jsx
- * Envolve o contexto WebGL (Canvas do R3F Native) com iluminação estúdio/natureza
- * balanceada (AmbientLight + DirectionalLights frontal e de preenchimento).
- *
- * Controles de Pan Suave:
- * Implementados via PanResponder nativo do React Native, manipulando o deslocamento
- * do diorama no plano XZ sem alterar o ângulo da câmera ortográfica.
- * Isso garante que a projeção isométrica matemática [10, 10, 10] permaneça intacta!
- */
-export default function IsometricCanvas({
-  biomeConfig,
-  entities = [],
-  onTilePress,
-  onEntityPress,
-  selectedCoord,
-}) {
-  // Controle de Pan do Diorama (Arrastar o mapa pelo toque na tela)
-  const [panOffset, setPanOffset] = useState([0, 0, 0]);
-  const lastPan = useRef({ x: 0, y: 0 });
+const MAP_RADIUS = 2.35;
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => false,
-      onMoveShouldSetPanResponder: (evt, gestureState) => {
-        // Ativa o pan somente se houver movimento significativo do dedo (> 8px)
-        return Math.abs(gestureState.dx) > 8 || Math.abs(gestureState.dy) > 8;
-      },
-      onPanResponderGrant: () => {
-        lastPan.current = { x: panOffset[0], y: panOffset[2] };
-      },
-      onPanResponderMove: (evt, gestureState) => {
-        // Converte o delta de pixels do toque 2D em translação suave 3D
-        // Sensibilidade calculada para resposta tátil natural
-        const sensitivity = 0.012;
-        const newX = lastPan.current.x + (gestureState.dx - gestureState.dy) * sensitivity * 0.7;
-        const newZ = lastPan.current.y + (gestureState.dy + gestureState.dx) * sensitivity * 0.7;
+function percentToPosition(item, height = 0.45) {
+  if (Array.isArray(item.position)) return item.position;
 
-        // Limita o alcance de arrasto para o mapa não sumir da tela (clamp bounds)
-        const clampedX = Math.max(-3.5, Math.min(3.5, newX));
-        const clampedZ = Math.max(-3.5, Math.min(3.5, newZ));
+  const x = ((Number(item.x ?? 50) - 50) / 50) * MAP_RADIUS;
+  const z = ((Number(item.y ?? 50) - 50) / 50) * MAP_RADIUS;
+  return [x, height, z];
+}
 
-        setPanOffset([clampedX, 0, clampedZ]);
-      },
-    })
-  ).current;
+function inferAnimalModel(item) {
+  const value = `${item.id || ''} ${item.name || ''}`.toLowerCase();
+  if (value.includes('jacar')) return 'alligator';
+  if (value.includes('capivara')) return 'capybara';
+  if (/tuiui|tucano|asa-branca|ema|ave/.test(value)) return 'bird';
+  return 'jaguar';
+}
 
-  // Lista combinada de entidades (configuração padrão do bioma + adicionadas pelo usuário)
-  const activeEntities = entities.length > 0 ? entities : biomeConfig?.initialEntities || [];
+function inferFloraModel(item, biomeId) {
+  const value = `${item.id || ''} ${item.name || ''}`.toLowerCase();
+  if (value.includes('vitória') || value.includes('vitoria')) return 'water_lily';
+  if (value.includes('cacto') || biomeId === 'caatinga') return 'cactus';
+  if (biomeId === 'pampa') return 'reeds';
+  return 'tropical_tree';
+}
+
+function createSceneEntities(biomeConfig, customEntities) {
+  const animals = (biomeConfig?.initialEntities || []).map((item) => ({
+    ...item,
+    type: 'animal',
+    modelType: item.modelType || inferAnimalModel(item),
+    position: percentToPosition(item, 0.42),
+    scale: (item.scale || 1) * 0.82,
+  }));
+
+  const flora = (biomeConfig?.flora || []).map((item) => {
+    const modelType = item.modelType || inferFloraModel(item, biomeConfig?.id);
+    return {
+      ...item,
+      type: modelType === 'tropical_tree' ? 'tree' : 'plant',
+      modelType,
+      position: percentToPosition(item, 0.35),
+      scale: 0.72,
+    };
+  });
+
+  const structures = (biomeConfig?.structures || []).map((item) => ({
+    ...item,
+    type: 'structure',
+    modelType: 'eco_station',
+    position: percentToPosition(item, 0.38),
+    scale: 0.8,
+  }));
+
+  const placed = (customEntities || []).map((item) => ({
+    ...item,
+    position: percentToPosition(item, 0.38),
+    scale: item.scale || 0.75,
+  }));
+
+  return [...animals, ...flora, ...structures, ...placed];
+}
+
+function BuildPlotMarker({ plot, onPress }) {
+  const position = percentToPosition(plot, 0.3);
 
   return (
-    <View style={styles.canvasWrapper} {...panResponder.panHandlers}>
-      <Canvas
-        style={styles.canvas}
-        gl={{
-          antialias: true,
-          alpha: true,
-          powerPreference: 'high-performance',
-        }}
-      >
-        {/* Câmera Isométrica Ortográfica Fixa [10, 10, 10] */}
-        <IsometricCamera zoom={46} />
+    <group position={position} onPointerDown={(event) => {
+      event.stopPropagation();
+      onPress?.({ ...plot, position });
+    }}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.2, 0.31, 20]} />
+        <meshBasicMaterial color='#FFD166' transparent opacity={0.95} />
+      </mesh>
+      <mesh position={[0, 0.04, 0]}>
+        <cylinderGeometry args={[0.06, 0.06, 0.08, 12]} />
+        <meshBasicMaterial color='#EF6C00' />
+      </mesh>
+    </group>
+  );
+}
 
-        {/* ILUMINAÇÃO ESTÚDIO LOW-POLY */}
-        {/* 1. Luz Ambiente Suave e Quente (evita sombras 100% pretas) */}
-        <ambientLight color="#FFF6EA" intensity={0.9} />
+class SceneErrorBoundary extends Component {
+  state = { error: null };
 
-        {/* 2. Luz Direcional Principal de Sol (cria sombras e volumes nítidos) */}
-        <directionalLight
-          position={[12, 18, 10]}
-          intensity={1.2}
-          color="#FFFDF5"
-        />
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
 
-        {/* 3. Luz de Preenchimento (Fill Light) no lado oposto para dar brilho de contorno */}
-        <directionalLight
-          position={[-10, 8, -12]}
-          intensity={0.4}
-          color="#D8F3DC"
-        />
+  componentDidCatch(error) {
+    console.error('Falha ao iniciar o mapa 3D:', error);
+    this.props.onError?.(error);
+  }
 
-        {/* GRUPO DO DIORAMA FLUTUANTE (com suporte a Pan suave) */}
-        <group position={panOffset}>
-          <Suspense fallback={null}>
-            {/* Bloco Diorama do Chão do Bioma */}
+  render() {
+    if (this.state.error) {
+      return (
+        <View style={styles.feedback}>
+          <Text style={styles.feedbackTitle}>O mapa 3D não pôde iniciar</Text>
+          <Text style={styles.feedbackText}>Reabra esta tela ou reinicie o Expo Go.</Text>
+        </View>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+export default function IsometricCanvas({
+  biomeConfig,
+  customEntities = [],
+  isEditMode = false,
+  onEntityPress,
+  onPlotPress,
+  onTilePress,
+  onReady,
+  onError,
+  selectedCoord,
+}) {
+  const sceneEntities = useMemo(
+    () => createSceneEntities(biomeConfig, customEntities),
+    [biomeConfig, customEntities]
+  );
+
+  const skyColor = biomeConfig?.skyColors?.[0] || '#E0F2FE';
+
+  return (
+    <View style={[styles.wrapper, { backgroundColor: skyColor }]} collapsable={false}>
+      <SceneErrorBoundary key={biomeConfig?.id} onError={onError}>
+        <Canvas
+          style={styles.canvas}
+          orthographic
+          camera={{ position: [10, 10, 10], zoom: 46, near: 0.1, far: 100 }}
+          frameloop='always'
+          onCreated={({ camera, gl }) => {
+            camera.lookAt(0, 0, 0);
+            gl.setClearColor(skyColor, 1);
+            onReady?.();
+          }}
+        >
+          <IsometricCamera zoom={46} />
+          <ambientLight color='#FFF6EA' intensity={0.85} />
+          <hemisphereLight args={['#DFF6FF', '#5B3A29', 0.55]} />
+          <directionalLight position={[12, 18, 10]} intensity={1.25} color='#FFFDF5' />
+          <directionalLight position={[-10, 8, -12]} intensity={0.35} color='#D8F3DC' />
+
+          <group>
             <BiomeBlock
               biomeConfig={biomeConfig}
               onTilePress={onTilePress}
               selectedCoord={selectedCoord}
             />
 
-            {/* Entidades Posicionadas (Animais, Árvores, Estruturas) */}
-            {activeEntities.map((entity) => (
-              <PlacedEntity
-                key={entity.id}
-                entity={entity}
-                onPress={onEntityPress}
-              />
+            {sceneEntities.map((entity) => (
+              <PlacedEntity key={entity.id} entity={entity} onPress={onEntityPress} />
             ))}
-          </Suspense>
-        </group>
-      </Canvas>
+
+            {isEditMode && (biomeConfig?.buildPlots || []).map((plot) => (
+              <BuildPlotMarker key={plot.id} plot={plot} onPress={onPlotPress} />
+            ))}
+          </group>
+        </Canvas>
+      </SceneErrorBoundary>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  canvasWrapper: {
+  wrapper: { flex: 1, width: '100%', height: '100%' },
+  canvas: { flex: 1, width: '100%', height: '100%' },
+  feedback: {
     flex: 1,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+    backgroundColor: '#E0F2FE',
   },
-  canvas: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
+  feedbackTitle: { color: '#1B4332', fontSize: 18, fontWeight: '900', textAlign: 'center' },
+  feedbackText: { color: '#52796F', fontSize: 13, marginTop: 8, textAlign: 'center' },
 });

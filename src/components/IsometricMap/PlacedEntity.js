@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber/native';
 import * as THREE from 'three';
 
 /**
@@ -175,6 +175,40 @@ function EntityModel({ type, modelType }) {
             <mesh position={[0.18, -0.2, -0.22]}>
               <boxGeometry args={[0.1, 0.18, 0.1]} />
               <meshStandardMaterial color="#5D4037" />
+            </mesh>
+          </group>
+        );
+
+      case 'bird':
+        return (
+          <group position={[0, -0.1, 0]}>
+            <mesh position={[0, 0.12, 0]}>
+              <sphereGeometry args={[0.2, 7, 7]} />
+              <meshStandardMaterial color='#F5F3E7' roughness={0.7} flatShading />
+            </mesh>
+            <mesh position={[0, 0.29, 0.1]}>
+              <sphereGeometry args={[0.13, 7, 7]} />
+              <meshStandardMaterial color='#FFFDF5' roughness={0.7} flatShading />
+            </mesh>
+            <mesh position={[0, 0.27, 0.25]} rotation={[Math.PI / 2, 0, 0]}>
+              <coneGeometry args={[0.055, 0.22, 4]} />
+              <meshStandardMaterial color='#F4A261' flatShading />
+            </mesh>
+            <mesh position={[-0.18, 0.12, -0.02]} rotation={[0, 0, -0.55]}>
+              <boxGeometry args={[0.22, 0.05, 0.28]} />
+              <meshStandardMaterial color='#263238' flatShading />
+            </mesh>
+            <mesh position={[0.18, 0.12, -0.02]} rotation={[0, 0, 0.55]}>
+              <boxGeometry args={[0.22, 0.05, 0.28]} />
+              <meshStandardMaterial color='#263238' flatShading />
+            </mesh>
+            <mesh position={[-0.07, -0.15, 0]}>
+              <cylinderGeometry args={[0.025, 0.025, 0.28, 5]} />
+              <meshStandardMaterial color='#D97706' />
+            </mesh>
+            <mesh position={[0.07, -0.15, 0]}>
+              <cylinderGeometry args={[0.025, 0.025, 0.28, 5]} />
+              <meshStandardMaterial color='#D97706' />
             </mesh>
           </group>
         );

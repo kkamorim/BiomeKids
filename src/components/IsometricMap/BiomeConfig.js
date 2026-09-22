@@ -14,7 +14,11 @@ export const BIOMES_CONFIG = {
     baseImage: require('../../../assets/Pantanal.png'),
     skyColors: ['#E0F7FA', '#B2EBF2'],
     accentColor: '#00838F',
+    baseColor: '#4A5D23',
+    surfaceColor: '#6F8F3D',
     waterColor: '#00ACC1',
+    hasWetlandSplit: true,
+    foliageType: 'wetland',
     initialEntities: [
       {
         id: 'pan_capivara',
@@ -91,7 +95,11 @@ export const BIOMES_CONFIG = {
     baseImage: require('../../../assets/Amazonia.png'),
     skyColors: ['#E8F5E9', '#C8E6C9'],
     accentColor: '#1B5E20',
+    baseColor: '#174D2C',
+    surfaceColor: '#2D7A46',
     waterColor: '#0288D1',
+    hasRiver: true,
+    foliageType: 'rainforest',
     initialEntities: [
       {
         id: 'amz_tucano',
@@ -156,7 +164,10 @@ export const BIOMES_CONFIG = {
     baseImage: require('../../../assets/Cerrado.png'),
     skyColors: ['#FFF3E0', '#FFE0B2'],
     accentColor: '#E65100',
+    baseColor: '#8D6E3B',
+    surfaceColor: '#C9954A',
     waterColor: '#29B6F6',
+    foliageType: 'savanna',
     initialEntities: [
       {
         id: 'cer_lobo',
@@ -221,7 +232,11 @@ export const BIOMES_CONFIG = {
     baseImage: require('../../../assets/Caatinga.png'),
     skyColors: ['#FFFDE7', '#FFF9C4'],
     accentColor: '#BF360C',
+    baseColor: '#8C5A32',
+    surfaceColor: '#D4A373',
     waterColor: '#26C6DA',
+    hasDunes: true,
+    foliageType: 'dryland',
     initialEntities: [
       {
         id: 'caa_asabranca',
@@ -286,7 +301,11 @@ export const BIOMES_CONFIG = {
     baseImage: require('../../../assets/MataAtlantica.png'),
     skyColors: ['#E0F2F1', '#B2DFDB'],
     accentColor: '#004D40',
+    baseColor: '#184E3A',
+    surfaceColor: '#2D6A4F',
     waterColor: '#00ACC1',
+    hasRiver: true,
+    foliageType: 'rainforest',
     initialEntities: [
       {
         id: 'mat_mico',
@@ -351,7 +370,10 @@ export const BIOMES_CONFIG = {
     baseImage: require('../../../assets/Pampa.png'),
     skyColors: ['#F1F8E9', '#DCEDC8'],
     accentColor: '#33691E',
+    baseColor: '#456B2F',
+    surfaceColor: '#79A84B',
     waterColor: '#42A5F5',
+    foliageType: 'grassland',
     initialEntities: [
       {
         id: 'pam_ema',

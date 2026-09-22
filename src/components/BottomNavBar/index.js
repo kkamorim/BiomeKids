@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, ImageBackground } from 'react-native';
+import { View, Text, Pressable, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useGame } from '../../contexts/GameContext';
@@ -24,16 +24,17 @@ export default function BottomNavBar({ activeTab = 'Mapa' }) {
 
   return (
     <View style={styles.outerContainer} pointerEvents="box-none">
-      {/* Placa de Madeira com Folhas nos Cantos */}
-      <ImageBackground
-        source={require('../../../assets/placa-navegacao.png')}
-        style={styles.woodBarBackground}
-        resizeMode="stretch"
-      >
+      <View style={styles.navShell}>
+        <Image
+          source={require('../../../assets/placa-navegacao.png')}
+          style={styles.woodBarImage}
+          resizeMode="stretch"
+          pointerEvents="none"
+        />
         <View style={styles.navRow}>
           {/* 1. Estudos */}
           <Pressable
-            style={styles.navItem}
+            style={[styles.navItem, activeTab === 'Estudos' && styles.navItemActive]}
             onPress={() => handleNavigate('Estudos', 'Estudos')}
           >
             <View style={[styles.iconCircle, activeTab === 'Estudos' && styles.iconCircleActive]}>
@@ -50,7 +51,7 @@ export default function BottomNavBar({ activeTab = 'Mapa' }) {
 
           {/* 2. Missões */}
           <Pressable
-            style={styles.navItem}
+            style={[styles.navItem, activeTab === 'Missões' && styles.navItemActive]}
             onPress={() => handleNavigate('Missões', 'Missoes')}
           >
             <View style={[styles.iconCircle, activeTab === 'Missões' && styles.iconCircleActive]}>
@@ -88,7 +89,7 @@ export default function BottomNavBar({ activeTab = 'Mapa' }) {
 
           {/* 4. Coleção */}
           <Pressable
-            style={styles.navItem}
+            style={[styles.navItem, activeTab === 'Coleção' && styles.navItemActive]}
             onPress={() => handleNavigate('Coleção', 'Colecao')}
           >
             <View style={[styles.iconCircle, activeTab === 'Coleção' && styles.iconCircleActive]}>
@@ -105,7 +106,7 @@ export default function BottomNavBar({ activeTab = 'Mapa' }) {
 
           {/* 5. Loja */}
           <Pressable
-            style={styles.navItem}
+            style={[styles.navItem, activeTab === 'Loja' && styles.navItemActive]}
             onPress={() => handleNavigate('Loja', 'Loja')}
           >
             <View style={[styles.iconCircle, activeTab === 'Loja' && styles.iconCircleActive]}>
@@ -120,7 +121,7 @@ export default function BottomNavBar({ activeTab = 'Mapa' }) {
             </Text>
           </Pressable>
         </View>
-      </ImageBackground>
+      </View>
     </View>
   );
 }

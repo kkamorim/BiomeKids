@@ -14,11 +14,17 @@ export default StyleSheet.create({
     zIndex: 1,
   },
 
+  mapFallbackLayer: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 2,
+    backgroundColor: '#E0F2FE',
+  },
+
   // Camada HUD 2D Overlay
   hudOverlay: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 10,
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
   },
 
   // 1. CABEÇALHO GLOBAL (Voltar, Badge do Bioma, Moedas e Diamantes à Direita)
@@ -98,7 +104,9 @@ export default StyleSheet.create({
   editModeToggleBtn: {
     position: 'absolute',
     bottom: 90, // Fica acima da barra de navegação de madeira
-    right: 16,
+    right: 'auto',
+    left:20,
+    zIndex: 20,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
