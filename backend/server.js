@@ -49,7 +49,7 @@ app.get('/favicon.ico', (req, res) => res.status(204).end());
 // Rota raiz de boas-vindas
 app.get('/', (req, res) => {
   res.status(200).json({
-    message: '🦁 Bem-vindo à API do ZooKids!',
+    message: '🌿 Bem-vindo à API do BiomeKids!',
     docs: 'Acesse /api/health para status do servidor',
   });
 });
@@ -58,7 +58,7 @@ app.get('/', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'online',
-    service: 'ZooKids Backend API',
+    service: 'BiomeKids Backend API',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
@@ -74,7 +74,7 @@ app.use('/api/user', userRoutes);
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    error: `Rota ${req.method} ${req.originalUrl} não encontrada no servidor ZooKids.`,
+    error: `Rota ${req.method} ${req.originalUrl} não encontrada no servidor BiomeKids.`,
   });
 });
 
@@ -102,7 +102,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`
 🦁 ===================================================
-🚀 ZooKids API rodando com sucesso!
+🚀 BiomeKids API rodando com sucesso!
 🌐 Porta: ${PORT}
 📍 URL Local: http://localhost:${PORT}/api/health
 🔒 Segurança: Helmet, Rate Limiter, bcrypt (12 rounds) & JWT

@@ -9,7 +9,7 @@ const {
 
 class AuthService {
   /**
-   * Registra um novo usuário no ZooKids com auditoria LGPD
+   * Registra um novo usuário no BiomeKids com auditoria LGPD
    */
   async register(data, clientInfo = {}) {
     const { fullName, email, password, birthDate, cep, termsVersion } = data;
@@ -52,20 +52,6 @@ class AuthService {
         termsVersion || '1.0',
       ]);
       const user = userResult.rows[0];
-
-      // Inicialização do Habitat Isométrico com JSONB
-      const habitatInsertQuery = `
-        INSERT INTO habitats (user_id, grid_data, last_watered_at, last_fed_at)
-        VALUES ($1, $2, NOW(), NOW())
-      `;
-      await client.query(habitatInsertQuery, [
-        user.id,
-        JSON.stringify({
-          tiles: [],
-          decorations: [],
-          unlockedTerritories: [1],
-        }),
-      ]);
 
       // Registro do Consentimento na Trilha de Auditoria LGPD
       const lgpdLogQuery = `

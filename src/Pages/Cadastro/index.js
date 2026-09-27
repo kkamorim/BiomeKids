@@ -189,7 +189,7 @@ export default function Conta() {
         'Conta Criada com Sucesso!',
         'Sua conta de escoteiro foi criada. Bem-vindo à expedição!',
         [
-          { text: 'OK', onPress: () => navigation.replace('Biomas') }
+          { text: 'OK', onPress: () => navigation.replace('Journey') }
         ]
       );
     } else {

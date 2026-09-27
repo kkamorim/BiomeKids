@@ -1,7 +1,7 @@
 {
-  "name": "zookids-backend",
+  "name": "biomekids-backend",
   "version": "1.0.0",
-  "description": "Backend API for ZooKids App with PostgreSQL, JWT Auth, and LGPD Compliance",
+  "description": "Backend API for BiomeKids with PostgreSQL, JWT Auth, and LGPD compliance",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -23,7 +23,7 @@
   "devDependencies": {
     "nodemon": "^3.1.9"
   },
-  "keywords": ["zookids", "nodejs", "postgresql", "lgpd", "jwt"],
-  "author": "ZooKids Team",
+  "keywords": ["biomekids", "education", "nodejs", "postgresql", "lgpd", "jwt"],
+  "author": "BiomeKids Team",
   "license": "ISC"
 }

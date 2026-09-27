@@ -1,126 +1,125 @@
 import React from 'react';
-import { View, Text, Pressable, Image } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGame } from '../../contexts/GameContext';
+import { palette, spacing } from '../../theme/designSystem';
 import styles from './styles';
 
-export default function BottomNavBar({ activeTab = 'Mapa' }) {
+const NAV_ITEMS = [
+  {
+    key: 'journey',
+    label: 'Trilha',
+    route: 'Journey',
+    icon: 'map-outline',
+    activeIcon: 'map',
+    aliases: ['Trilha', 'Journey', 'Estudos'],
+  },
+  {
+    key: 'evolution',
+    label: 'Árvore',
+    route: 'Evolution',
+    icon: 'git-network-outline',
+    activeIcon: 'git-network',
+    aliases: ['Árvore', 'Arvore', 'Evolution'],
+  },
+  {
+    key: 'missions',
+    label: 'Missões',
+    route: 'Missoes',
+    icon: 'ribbon-outline',
+    activeIcon: 'ribbon',
+    aliases: ['Missões', 'Missoes'],
+  },
+  {
+    key: 'collection',
+    label: 'Coleção',
+    route: 'Colecao',
+    icon: 'paw-outline',
+    activeIcon: 'paw',
+    aliases: ['Coleção', 'Colecao'],
+  },
+  {
+    key: 'shop',
+    label: 'Loja',
+    route: 'Loja',
+    icon: 'storefront-outline',
+    activeIcon: 'storefront',
+    aliases: ['Loja'],
+  },
+];
+
+function isItemActive(item, activeTab) {
+  if (!activeTab) return false;
+  const normalizedActiveTab = String(activeTab).toLocaleLowerCase('pt-BR');
+  return [item.route, item.label, ...item.aliases].some(
+    (value) => value.toLocaleLowerCase('pt-BR') === normalizedActiveTab
+  );
+}
+
+export default function BottomNavBar({ activeTab = 'Journey', style }) {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const { unclaimedMissions = 0 } = useGame();
 
-  const isMapaActive = activeTab === 'Mapa' || activeTab === 'BiomeMap';
-
-  const handleNavigate = (tabName, routeName) => {
-    // Se o usuário está dentro de um mapa de bioma e clica no botão Mapa, volta para a seleção de biomas
-    if (activeTab === 'BiomeMap' && tabName === 'Mapa') {
-      navigation.navigate('Biomas');
-      return;
+  const navigateTo = (item, active) => {
+    if (!active) {
+      navigation.navigate(item.route);
     }
-
-    if (activeTab === tabName) return;
-    navigation.navigate(routeName);
   };
 
   return (
-    <View style={styles.outerContainer} pointerEvents="box-none">
-      <View style={styles.navShell}>
-        <Image
-          source={require('../../../assets/placa-navegacao.png')}
-          style={styles.woodBarImage}
-          resizeMode="stretch"
-          pointerEvents="none"
-        />
-        <View style={styles.navRow}>
-          {/* 1. Estudos */}
-          <Pressable
-            style={[styles.navItem, activeTab === 'Estudos' && styles.navItemActive]}
-            onPress={() => handleNavigate('Estudos', 'Estudos')}
-          >
-            <View style={[styles.iconCircle, activeTab === 'Estudos' && styles.iconCircleActive]}>
-              <Ionicons
-                name={activeTab === 'Estudos' ? 'book' : 'book-outline'}
-                size={22}
-                color={activeTab === 'Estudos' ? '#FFE082' : '#FFE8B8'}
-              />
-            </View>
-            <Text style={[styles.navText, activeTab === 'Estudos' && styles.navTextActive]}>
-              Estudos
-            </Text>
-          </Pressable>
+    <View
+      pointerEvents={'box-none'}
+      style={[
+        styles.outerContainer,
+        { paddingBottom: Math.max(insets.bottom, spacing.xs) },
+        style,
+      ]}
+    >
+      <View style={styles.navShell} accessibilityRole={'tablist'}>
+        {NAV_ITEMS.map((item) => {
+          const active = isItemActive(item, activeTab);
+          const badgeCount = item.key === 'missions' ? unclaimedMissions : 0;
 
-          {/* 2. Missões */}
-          <Pressable
-            style={[styles.navItem, activeTab === 'Missões' && styles.navItemActive]}
-            onPress={() => handleNavigate('Missões', 'Missoes')}
-          >
-            <View style={[styles.iconCircle, activeTab === 'Missões' && styles.iconCircleActive]}>
-              <Ionicons
-                name={activeTab === 'Missões' ? 'ribbon' : 'ribbon-outline'}
-                size={23}
-                color={activeTab === 'Missões' ? '#FFE082' : '#FFE8B8'}
-              />
-              {/* Badge de missões */}
-              {unclaimedMissions > 0 && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{unclaimedMissions}</Text>
-                </View>
-              )}
-            </View>
-            <Text style={[styles.navText, activeTab === 'Missões' && styles.navTextActive]}>
-              Missões
-            </Text>
-          </Pressable>
-
-          {/* 3. MAPA (Botão Central Elevado em Relevo com Globo) */}
-          <View style={styles.centerItemWrapper}>
+          return (
             <Pressable
-              style={styles.centerButton}
-              onPress={() => handleNavigate('Mapa', 'Biomas')}
+              key={item.key}
+              accessibilityRole={'tab'}
+              accessibilityLabel={item.label + ', aba'}
+              accessibilityState={{ selected: active }}
+              hitSlop={4}
+              onPress={() => navigateTo(item, active)}
+              style={({ pressed }) => [
+                styles.navItem,
+                active && styles.navItemActive,
+                pressed && styles.navItemPressed,
+              ]}
             >
-              <View style={[styles.centerGlobeRing, isMapaActive && styles.centerGlobeRingActive]}>
-                <Ionicons name="earth" size={32} color="#FFF" />
+              <View style={[styles.iconCircle, active && styles.iconCircleActive]}>
+                <Ionicons
+                  name={active ? item.activeIcon : item.icon}
+                  size={21}
+                  color={active ? palette.inverseText : palette.textMuted}
+                />
+                {badgeCount > 0 ? (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText} numberOfLines={1}>
+                      {badgeCount > 99 ? '99+' : badgeCount}
+                    </Text>
+                  </View>
+                ) : null}
               </View>
-              <Text style={[styles.centerText, isMapaActive && styles.centerTextActive]}>
-                Mapa
+              <Text
+                style={[styles.navText, active && styles.navTextActive]}
+                numberOfLines={1}
+              >
+                {item.label}
               </Text>
             </Pressable>
-          </View>
-
-          {/* 4. Coleção */}
-          <Pressable
-            style={[styles.navItem, activeTab === 'Coleção' && styles.navItemActive]}
-            onPress={() => handleNavigate('Coleção', 'Colecao')}
-          >
-            <View style={[styles.iconCircle, activeTab === 'Coleção' && styles.iconCircleActive]}>
-              <FontAwesome5
-                name="paw"
-                size={20}
-                color={activeTab === 'Coleção' ? '#FFE082' : '#FFE8B8'}
-              />
-            </View>
-            <Text style={[styles.navText, activeTab === 'Coleção' && styles.navTextActive]}>
-              Coleção
-            </Text>
-          </Pressable>
-
-          {/* 5. Loja */}
-          <Pressable
-            style={[styles.navItem, activeTab === 'Loja' && styles.navItemActive]}
-            onPress={() => handleNavigate('Loja', 'Loja')}
-          >
-            <View style={[styles.iconCircle, activeTab === 'Loja' && styles.iconCircleActive]}>
-              <Ionicons
-                name={activeTab === 'Loja' ? 'basket' : 'basket-outline'}
-                size={22}
-                color={activeTab === 'Loja' ? '#FFE082' : '#FFE8B8'}
-              />
-            </View>
-            <Text style={[styles.navText, activeTab === 'Loja' && styles.navTextActive]}>
-              Loja
-            </Text>
-          </Pressable>
-        </View>
+          );
+        })}
       </View>
     </View>
   );

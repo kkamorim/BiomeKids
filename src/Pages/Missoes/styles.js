@@ -1,198 +1,178 @@
 import { StyleSheet } from 'react-native';
 
+import { palette, radius, shadows, spacing } from '../../theme/designSystem';
+
 export default StyleSheet.create({
-  container: {
-    flex: 1,
+  content: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: 122,
   },
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 8,
-  },
-  titleContainer: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 22,
+  eyebrow: {
+    marginTop: spacing.md,
+    color: palette.textMuted,
+    fontSize: 10,
     fontWeight: '900',
-    color: '#3E2723',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    letterSpacing: 1.3,
   },
-  headerSubtitle: {
-    fontSize: 12,
-    color: '#4E6E5D',
-    fontWeight: '600',
-    marginTop: 2,
+  title: {
+    marginTop: spacing.xs,
+    color: palette.textStrong,
+    fontSize: 27,
+    fontWeight: '900',
   },
-  tabFilter: {
+  subtitle: {
+    marginTop: spacing.sm,
+    color: palette.textMuted,
+    fontSize: 14,
+    lineHeight: 21,
+  },
+  tabs: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    gap: 10,
-    marginVertical: 10,
+    gap: spacing.sm,
+    marginTop: spacing.xl,
+    marginBottom: spacing.md,
+    padding: spacing.xs,
+    borderRadius: radius.lg,
+    backgroundColor: palette.surfaceMuted,
   },
-  filterBtn: {
+  tab: {
     flex: 1,
-    paddingVertical: 8,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: '#D7CCC8',
-  },
-  filterBtnActive: {
-    backgroundColor: '#2E7D32',
-    borderColor: '#1B5E20',
-  },
-  filterBtnText: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#5D4037',
-  },
-  filterBtnTextActive: {
-    color: '#FFF',
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-  },
-  missionCard: {
-    backgroundColor: '#FAF9F4',
-    borderRadius: 20,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1.5,
-    borderColor: '#E0D8C3',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-  },
-  missionCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  missionIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#E8F5E9',
+    minHeight: 43,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: '#A5D6A7',
+    borderRadius: radius.md,
   },
-  missionTitleWrapper: {
-    flex: 1,
+  tabActive: {
+    backgroundColor: palette.surface,
+    ...shadows.sm,
   },
-  missionTitle: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#2E382E',
-  },
-  missionDesc: {
+  tabText: {
+    color: palette.textMuted,
     fontSize: 12,
-    color: '#666',
-    marginTop: 2,
+    fontWeight: '800',
   },
-  progressContainer: {
+  tabTextActive: {
+    color: palette.primaryDeep,
+    fontWeight: '900',
+  },
+  card: {
+    marginTop: spacing.md,
+    padding: spacing.lg,
+    borderWidth: 1.5,
+    borderColor: palette.border,
+    borderRadius: radius.xl,
+    backgroundColor: palette.surface,
+    ...shadows.sm,
+  },
+  cardDone: {
+    borderColor: '#A9DC8A',
+    backgroundColor: '#FAFFF7',
+  },
+  cardTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    marginTop: 12,
   },
-  progressBarBg: {
+  iconBox: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.md,
+    backgroundColor: palette.primarySoft,
+  },
+  cardCopy: {
     flex: 1,
-    height: 10,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 5,
-    overflow: 'hidden',
+    marginLeft: spacing.md,
+    paddingRight: spacing.sm,
   },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: '#43A047',
-    borderRadius: 5,
+  cardTitle: {
+    color: palette.textStrong,
+    fontSize: 15,
+    fontWeight: '900',
   },
-  progressText: {
+  cardDescription: {
+    marginTop: spacing.xs,
+    color: palette.textMuted,
+    fontSize: 11,
+    lineHeight: 16,
+  },
+  progressNumber: {
+    color: palette.primaryDeep,
     fontSize: 12,
-    fontWeight: '800',
-    color: '#2E7D32',
-    minWidth: 32,
-    textAlign: 'right',
+    fontWeight: '900',
+    fontVariant: ['tabular-nums'],
+  },
+  progressTrack: {
+    height: 9,
+    marginTop: spacing.lg,
+    overflow: 'hidden',
+    borderRadius: radius.pill,
+    backgroundColor: palette.disabledSurface,
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: radius.pill,
+    backgroundColor: palette.primary,
   },
   cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 14,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#ECE8DD',
+    gap: spacing.sm,
+    marginTop: spacing.md,
   },
-  rewardBadges: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  rewardPill: {
-    backgroundColor: '#FFF8E1',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#FFE082',
-  },
-  rewardPillXP: {
-    backgroundColor: '#E8EAF6',
-    borderColor: '#C5CAE9',
-  },
-  rewardPillText: {
+  reward: {
+    flex: 1,
+    color: palette.text,
     fontSize: 11,
     fontWeight: '800',
-    color: '#3E2723',
   },
-  claimBtn: {
-    backgroundColor: '#2E7D32',
-    paddingHorizontal: 16,
-    paddingVertical: 7,
-    borderRadius: 14,
-    elevation: 2,
+  claimButton: {
+    minWidth: 106,
+    minHeight: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: palette.primary,
   },
-  claimBtnText: {
-    color: '#FFF',
-    fontSize: 12,
-    fontWeight: '800',
+  claimDisabled: {
+    backgroundColor: palette.disabledSurface,
   },
-  claimedBadge: {
+  claimText: {
+    color: palette.inverseText,
+    fontSize: 11,
+    fontWeight: '900',
+  },
+  claimed: {
+    minHeight: 38,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: '#E8F5E9',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
   },
   claimedText: {
+    color: palette.success,
+    fontSize: 11,
+    fontWeight: '900',
+  },
+  tip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginTop: spacing.xl,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+    backgroundColor: '#FFF7DC',
+  },
+  tipEmoji: {
+    fontSize: 25,
+  },
+  tipText: {
+    flex: 1,
+    color: '#6F5A21',
     fontSize: 12,
     fontWeight: '700',
-    color: '#2E7D32',
-  },
-  pendingBadge: {
-    backgroundColor: '#F5F5F5',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
-  },
-  pendingText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#888',
+    lineHeight: 18,
   },
 });

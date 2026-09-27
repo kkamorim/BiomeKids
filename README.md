@@ -1,47 +1,50 @@
-# 🦁 BiomeKids — Exploradores da Natureza
+# BiomeKids
 
-> **Aplicativo mobile educativo e gamificado para o ensino lúdico de fauna, biomas e preservação ambiental para o público infantil.**
+Aplicativo educativo gamificado sobre os biomas do mundo, construído com React Native e Expo.
 
----
+## Experiência principal
 
-## 🌿 Sobre o Projeto
+O projeto segue uma jornada contínua inspirada em trilhas de aprendizagem:
 
-O **BiomeKids** é um aplicativo mobile desenvolvido para conectar crianças ao universo dos animais e da natureza de forma divertida, interativa e segura. 
+- 9 capítulos: Floresta Tropical, Alagados, Savana, Deserto, Pradarias, Floresta Temperada, Taiga, Tundra e Oceanos;
+- 25 níveis de estudo por bioma, totalizando 225 níveis;
+- uma transição visual após cada capítulo, como o nível 26 entre Floresta Tropical e Alagados;
+- uma árvore de evolução própria por bioma, com atributos liberados pelo nível de estudo e comprados com pontos ecológicos;
+- produção automática de pontos ecológicos e moedas globais, inclusive durante períodos fora do aplicativo;
+- missão principal que exige os 25 níveis e a árvore completa antes de liberar o bioma seguinte.
 
-Através de uma interface visual rica e intuitiva, as crianças exploram diferentes territórios, descobrem espécies animais, aprendem sobre hábitos alimentares e habitats, e testam seus conhecimentos com quizzes e desafios educativos.
+## Sistemas
 
----
+- aulas curtas com história, pergunta e recompensa;
+- moedas, diamantes, XP, corações e combustível;
+- missões diárias e semanais com ciclos reais de reinício;
+- multiplicadores temporários de moedas e XP;
+- loja de energia, boosts e cosméticos;
+- coleção com 107 registros de flora, fauna, descobertas e insígnias;
+- perfil, conquistas, estatísticas e progresso persistente no dispositivo.
 
-## ✨ Funcionalidades Principais
+O antigo mapa 2D/3D, territórios e dependências Three.js foram removidos. A navegação atual é formada por Trilha, Árvore de Evolução, Missões, Coleção e Loja.
 
-- 🗺️ **Territórios & Biomas**: Navegação temática por regiões ecológicas com espécies características de cada ecossistema.
-- 🐾 **Enciclopédia Animal Interativa**: Fichas com fotos, curiosidades, sons e informações essenciais sobre cada animal (habitat, dieta e comportamento).
-- 🎮 **Gamificação & Quizzes**: Desafios de perguntas e respostas para fixação do aprendizado, com progresso e conquistas.
-- 🔐 **Área do Usuário & Autenticação**: Cadastro e login seguro para personalização da experiência e acompanhamento da jornada de estudos.
-- 🛡️ **Privacidade & Conformidade com a LGPD**: Sistema planejado com proteção de dados infantis, gestão transparente de consentimento e termos de uso.
+## Executar
 
----
+```bash
+npm install
+npm run web
+```
 
-## 🛠️ Tecnologias Utilizadas
+Outros comandos:
 
-### **Mobile (Frontend)**
-- **React Native** (com **Expo**)
-- **React Navigation** (Navegação em pilhas)
-- **Expo Secure Store** (Armazenamento seguro de credenciais)
-- **Axios** (Integração com API REST)
+```bash
+npm run android
+npm run ios
+npm run export:web
+```
 
-### **Backend & Banco de Dados**
-- **Node.js** & **Express.js**
-- **PostgreSQL** (com `pgcrypto` para identificadores seguros)
-- **JWT (JSON Web Tokens)** & **Bcrypt** (Autenticação e criptografia de senhas)
-- **Zod** (Validação e integridade de dados)
-- **Rate Limit & Helmet** (Proteção e segurança da API)
+## Estrutura principal
 
----
-
-## 🔒 Privacidade e Segurança (LGPD)
-
-O projeto prioriza a segurança e a proteção de dados:
-- Trilha de consentimento e termos de privacidade registrados.
-- Criptografia de ponta a ponta para credenciais de acesso.
-- Mecanismos de exclusão controlada e anonimização de dados conforme a Lei Geral de Proteção de Dados (Lei nº 13.709/2018).
+- `src/data/biomeJourney.js`: capítulos, níveis, árvores, loja e missões;
+- `src/contexts/GameContext.js`: progresso, economia, renda passiva e persistência;
+- `src/Pages/Journey`: trilha de aprendizagem;
+- `src/Pages/Lesson`: experiência de aula;
+- `src/Pages/Evolution`: árvore ativa do bioma;
+- `src/Pages/Transition`: passagem visual entre biomas.

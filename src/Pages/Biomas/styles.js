@@ -1,186 +1,28 @@
-import { StyleSheet, Dimensions } from 'react-native';
-
-const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - 40) / 2;
+import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  safeArea: {
-    flex: 1,
-  },
-
-  alert: {
-    width: CARD_WIDTH,
-    height: 122,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1,
-  },
-
-  // ─── CABEÇALHO (Botão Voltar, Placa Central MAPA, Botão Perfil) ───
-  headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 8,
-    paddingHorizontal: 12,
-    marginBottom: 4,
-  },
-  circleWoodBtn: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: '#733E14',
-    borderWidth: 2.5,
-    borderColor: '#D4883B',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
-  },
-  placaTopo: {
-    flex: 1,
-    height: 85,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 4,
-  },
-
-  // ─── GRID DE CARDS (2 COLUNAS) ───
-  flatListContent: {
-    paddingHorizontal: 12,
-    paddingBottom: 110, // Espaço para a barra inferior de madeira
-  },
-  columnWrapper: {
-    justifyContent: 'space-between',
-    marginTop: 20,
-  },
-  cardContainer: {
-    width: CARD_WIDTH,
-    alignItems: 'center',
-  },
-  ilhaWrapper: {
-    width: CARD_WIDTH,
-    height: 122,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1,
-  },
-  ilhaImagem: {
-    width: '100%',
-    height: '100%',
-  },
-  ilhaBloqueadaImagem: {
-    opacity: 0.42,
-  },
-
-  // ─── PLACA VERDE DE MADEIRA (Liberado) ───
-  placaVerdeWrapper: {
-    flexDirection: 'row',
-    width: '100%',
-    backgroundColor: '#2E7D32',
-    borderRadius: 16,
-    borderWidth: 2.5,
-    borderColor: '#4CAF50',
-    paddingVertical: 5,
-    paddingHorizontal: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: -8,
-    zIndex: 2,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  containerLiberado: {
-    flexDirection: 'column',
-    marginRight: 'auto',
-    gap: 2,
-    paddingHorizontal: 5,
-    borderRadius: 10,
-    marginTop: 3,
-  },
-
-  tituloVerde: {
-    fontSize: 12,
-    fontWeight: '900',
-    color: '#FFF',
-    letterSpacing: 0.8,
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
-  },
-
-  liberadoText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#FFF',
-  },
-
-  cadeadoCircleOpen: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: '#90A4AE',
-  },
-
-  // ─── PLACA CINZA DE PEDRA (Bloqueado) ───
-  placaCinzaWrapper: {
-    width: '100%',
-    backgroundColor: '#455A64',
-    borderRadius: 16,
-    borderWidth: 2.5,
-    borderColor: '#78909C',
-    paddingVertical: 8,
-    paddingHorizontal: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: -8,
-    zIndex: 2,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3,
-  },
-  placaCinzaTextCol: {
-    flex: 1,
-    paddingRight: 4,
-  },
-  tituloCinza: {
-    fontSize: 12,
-    fontWeight: '900',
-    color: '#ECEFF1',
-    letterSpacing: 0.6,
-  },
-  requisitoCinza: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: '#B0BEC5',
-    marginTop: 2,
-  },
-  cadeadoCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#37474F',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: '#90A4AE',
-  },
+  content: { paddingHorizontal: 16, paddingBottom: 32 },
+  heading: { paddingVertical: 15 },
+  eyebrow: { color: '#6F8075', fontSize: 10, fontWeight: '900', letterSpacing: 1.3 },
+  title: { color: '#17382B', fontSize: 27, fontWeight: '900', marginTop: 4 },
+  subtitle: { color: '#6D7A72', fontSize: 14, lineHeight: 21, marginTop: 6 },
+  timeline: { marginTop: 7 },
+  timelineRow: { flexDirection: 'row', alignItems: 'center', position: 'relative', paddingBottom: 16 },
+  timelineLine: { position: 'absolute', width: 4, left: 18, top: 38, bottom: -16, borderRadius: 2, backgroundColor: '#D2DDD5' },
+  orderBubble: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', zIndex: 2, borderWidth: 3, borderColor: '#FFFFFF' },
+  orderText: { color: '#FFFFFF', fontSize: 13, fontWeight: '900' },
+  card: { flex: 1, minHeight: 132, marginLeft: 11, borderRadius: 22, backgroundColor: '#FFFFFF', flexDirection: 'row', overflow: 'hidden', borderWidth: 1, borderColor: '#E0E8E2', shadowColor: '#1D382D', shadowOpacity: 0.09, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 3 },
+  cover: { width: 104, alignItems: 'center', justifyContent: 'center' },
+  biomeEmoji: { fontSize: 48 },
+  levelPill: { backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 11, paddingHorizontal: 8, paddingVertical: 4, marginTop: 7 },
+  levelText: { color: '#FFFFFF', fontSize: 9, fontWeight: '900' },
+  cardBody: { flex: 1, padding: 13 },
+  cardTitleRow: { flexDirection: 'row', alignItems: 'center' },
+  biomeName: { flex: 1, color: '#203B30', fontSize: 16, fontWeight: '900' },
+  activePill: { borderRadius: 9, paddingHorizontal: 7, paddingVertical: 4 },
+  activeText: { fontSize: 8, fontWeight: '900', letterSpacing: 0.5 },
+  description: { color: '#738078', fontSize: 11, lineHeight: 16, marginTop: 6 },
+  progressRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 'auto' },
+  progressText: { color: '#53645B', fontSize: 10, fontWeight: '800' },
+  footerSpace: { height: 20 },
 });

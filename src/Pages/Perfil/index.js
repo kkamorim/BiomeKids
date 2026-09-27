@@ -1,319 +1,455 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  Switch,
   Alert,
-  Image,
-  ImageBackground,
   Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+
+import AppBackground from '../../components/AppBackground';
+import BottomNavBar from '../../components/BottomNavBar';
 import { useAuth } from '../../contexts/AuthContext';
 import { useGame } from '../../contexts/GameContext';
-import { getScoutLevel, getXPToNextLevel } from '../../data/gameData';
+import { BIOME_CHAPTERS, JOURNEY_STEPS } from '../../data/biomeJourney';
 import styles from './styles';
+
+const XP_PER_LEVEL = 250;
+
+const formatNumber = (value) => {
+  const number = Number(value) || 0;
+  if (number >= 1000000) return (number / 1000000).toFixed(1).replace('.0', '') + ' mi';
+  if (number >= 1000) return (number / 1000).toFixed(1).replace('.0', '') + ' mil';
+  return String(Math.floor(number));
+};
+
+const roleForLevel = (level) => {
+  if (level >= 20) return 'Guardião do planeta';
+  if (level >= 12) return 'Ecólogo de campo';
+  if (level >= 6) return 'Pesquisador da natureza';
+  return 'Explorador iniciante';
+};
+
+function askForConfirmation(title, message, confirmLabel, action) {
+  if (Platform.OS === 'web' && typeof globalThis.confirm === 'function') {
+    if (globalThis.confirm(message)) action();
+    return;
+  }
+
+  Alert.alert(title, message, [
+    { text: 'Cancelar', style: 'cancel' },
+    { text: confirmLabel, style: 'destructive', onPress: action },
+  ]);
+}
+
+function showNotice(title, message) {
+  if (Platform.OS === 'web' && typeof globalThis.alert === 'function') {
+    globalThis.alert(message);
+    return;
+  }
+  Alert.alert(title, message);
+}
 
 export default function Perfil() {
   const navigation = useNavigation();
   const { user, logout } = useAuth();
-  const { xp = 0, coins = 10, totalCoinsEarned = 10, dailyStreak = 1, dailyActions = {} } = useGame();
+  const game = useGame();
 
-  // Nível do escoteiro
-  const scoutLevel = getScoutLevel(xp);
-  const xpProgression = getXPToNextLevel(xp);
+  const {
+    xp = 0,
+    streak = 0,
+    coins = 0,
+    diamonds = 0,
+    collection = [],
+    completedSteps = [],
+    biomeProgress = {},
+    unlockedBiomes = [],
+    journeyProgress = {},
+    stats = {},
+    resetProgress,
+  } = game;
 
-  // Estados de Acessibilidade
-  const [ttsEnabled, setTtsEnabled] = useState(false);
-  const [highContrast, setHighContrast] = useState(false);
-  const [largeFont, setLargeFont] = useState(false);
-  const [sfxEnabled, setSfxEnabled] = useState(true);
-  const [musicEnabled, setMusicEnabled] = useState(true);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const completedSet = useMemo(() => new Set(completedSteps), [completedSteps]);
+  const level = Math.floor(xp / XP_PER_LEVEL) + 1;
+  const currentLevelXp = xp % XP_PER_LEVEL;
+  const xpPercent = Math.min(100, (currentLevelXp / XP_PER_LEVEL) * 100);
+  const displayName = user?.fullName || user?.nome || user?.name || 'Explorador BiomeKids';
+  const displayEmail = user?.email || 'Progresso local neste dispositivo';
 
-  // Lista de Conquistas
+  const biomeSummaries = useMemo(() => BIOME_CHAPTERS.map((biome, index) => {
+    const lessonIds = JOURNEY_STEPS
+      .filter((step) => step.type === 'lesson' && step.biomeId === biome.id)
+      .map((step) => step.id);
+    const lessons = lessonIds.filter((id) => completedSet.has(id)).length;
+    const progress = biomeProgress[biome.id] || {};
+    const nodes = Array.isArray(progress.unlockedNodes) ? progress.unlockedNodes.length : 0;
+    const totalNodes = biome.treeNodes?.length || 1;
+    const percent = Math.round(
+      Math.min(1, (lessons / 25) * 0.75 + (nodes / totalNodes) * 0.25) * 100
+    );
+    return {
+      ...biome,
+      lessons,
+      nodes,
+      totalNodes,
+      percent,
+      complete: lessons >= 25 && nodes >= totalNodes,
+      unlocked: index === 0 || unlockedBiomes.includes(biome.id),
+    };
+  }), [biomeProgress, completedSet, unlockedBiomes]);
+
+  const completedBiomes = biomeSummaries.filter((biome) => biome.complete).length;
+
   const achievements = [
     {
-      id: '1',
-      title: 'Primeiro Resgate',
-      description: 'Alimente ou hidrate seu primeiro animal.',
-      icon: 'heart',
-      completed: (dailyActions?.animalsFed || 0) > 0,
-      reward: '+20 🪙',
+      id: 'first-lesson',
+      icon: 'leaf',
+      title: 'Primeira descoberta',
+      description: 'Conclua seu primeiro nível de estudo.',
+      complete: (stats.lessonsCompleted || 0) >= 1,
     },
     {
-      id: '2',
-      title: 'Biólogo Mirim',
-      description: 'Acerte 100% em qualquer quiz de estudo.',
-      icon: 'school',
-      completed: (dailyActions?.quizzesCompleted || 0) > 0,
-      reward: '+30 🪙',
+      id: 'streak',
+      icon: 'flame',
+      title: 'Ritmo natural',
+      description: 'Mantenha uma sequência de 3 dias.',
+      complete: streak >= 3,
     },
     {
-      id: '3',
-      title: 'Guardião das Águas',
-      description: 'Ajude os animais do Pantanal a se refrescarem.',
-      icon: 'water',
-      completed: true,
-      reward: '+15 🪙',
+      id: 'tree',
+      icon: 'git-network',
+      title: 'Raízes fortes',
+      description: 'Desbloqueie 3 atributos de evolução.',
+      complete: (stats.nodesUnlocked || 0) >= 3,
     },
     {
-      id: '4',
-      title: 'Explorador da Floresta',
-      description: 'Desbloqueie o mapa da Amazônia.',
-      icon: 'compass',
-      completed: false,
-      reward: '+50 🪙',
+      id: 'biome',
+      icon: 'earth',
+      title: 'Guardião de bioma',
+      description: 'Complete estudos e árvore de um bioma.',
+      complete: completedBiomes >= 1,
+    },
+    {
+      id: 'collection',
+      icon: 'albums',
+      title: 'Caderno de campo',
+      description: 'Registre 10 itens na coleção.',
+      complete: collection.length >= 10,
+    },
+    {
+      id: 'planet',
+      icon: 'trophy',
+      title: 'Guardião do planeta',
+      description: 'Conclua toda a trilha dos 9 biomas.',
+      complete: (journeyProgress.percent || 0) >= 100,
     },
   ];
 
-  // Ação de Logout
-  const handleLogout = () => {
-    Alert.alert(
-      'Sair da Conta 🚪',
-      'Tem certeza de que deseja sair? Seu progresso salvo permanecerá seguro.',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Sim, Sair',
-          style: 'destructive',
-          onPress: async () => {
-            await logout();
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'Home' }],
-            });
-          },
-        },
-      ]
+  const completedAchievements = achievements.filter((item) => item.complete).length;
+
+  const profileStats = [
+    { icon: 'school', value: stats.lessonsCompleted || 0, label: 'níveis' },
+    { icon: 'git-network', value: stats.nodesUnlocked || 0, label: 'atributos' },
+    { icon: 'albums', value: collection.length, label: 'registros' },
+    { icon: 'earth', value: completedBiomes, label: 'biomas' },
+    { icon: 'cash', value: formatNumber(stats.totalCoinsEarned), label: 'moedas ganhas' },
+    { icon: 'checkmark-done', value: stats.missionsClaimed || 0, label: 'missões' },
+  ];
+
+  const handleReset = () => {
+    askForConfirmation(
+      'Recomeçar progresso',
+      'Isso apaga níveis, moedas, árvores, coleção e missões salvas neste dispositivo. Esta ação não pode ser desfeita.',
+      'Recomeçar',
+      async () => {
+        try {
+          await resetProgress();
+          showNotice('Tudo pronto', 'Sua nova expedição começou na Floresta Tropical.');
+        } catch {
+          showNotice('Não foi possível recomeçar', 'Tente novamente em alguns instantes.');
+        }
+      }
     );
   };
 
+  const handleLogout = () => {
+    askForConfirmation(
+      'Sair da conta',
+      'Seu progresso local continuará salvo neste dispositivo.',
+      'Sair',
+      async () => {
+        await logout();
+        navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+      }
+    );
+  };
+
+  const activeColors = game.activeBiome?.theme;
+
   return (
-    <ImageBackground
-      source={require('../../../assets/fundo-ceu.png')}
-      style={styles.container}
-      resizeMode="cover"
+    <AppBackground
+      gradientColors={[
+        activeColors?.background || '#F2FAEC',
+        activeColors?.soft || '#E7F5DF',
+        '#FFF8E8',
+      ]}
+      decorationColors={[
+        activeColors?.primary || '#58CC02',
+        activeColors?.secondary || '#1CB0F6',
+        '#F5A623',
+      ]}
     >
-      <SafeAreaView style={styles.safeArea}>
-        {/* Cabeçalho */}
-        <View style={styles.header}>
-          <Pressable
-            style={styles.backBtn}
-            onPress={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Biomas')}
-          >
-            <Ionicons name="arrow-back" size={22} color="#4A3428" />
-          </Pressable>
+      <StatusBar style={'dark'} />
 
-          <Text style={styles.headerTitle}>Perfil do Escoteiro</Text>
+      <View style={styles.header}>
+        <Pressable
+          accessibilityRole={'button'}
+          accessibilityLabel={'Voltar'}
+          hitSlop={8}
+          onPress={() => (
+            navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Journey')
+          )}
+          style={({ pressed }) => [styles.headerButton, pressed && styles.pressed]}
+        >
+          <Ionicons name={'arrow-back'} size={21} color={'#245C16'} />
+        </Pressable>
+        <View style={styles.headerCopy}>
+          <Text style={styles.headerEyebrow}>CADERNO DO EXPLORADOR</Text>
+          <Text style={styles.headerTitle}>Meu perfil</Text>
+        </View>
+        <View style={styles.headerButtonPlaceholder} />
+      </View>
 
-          <View style={styles.headerSpacer} />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={styles.profileCard}>
+          <View style={styles.avatarWrap}>
+            <View style={styles.avatar}>
+              <Ionicons name={'person'} size={42} color={'#3F9700'} />
+            </View>
+            <View style={styles.levelBadge}>
+              <Text style={styles.levelBadgeText}>{level}</Text>
+            </View>
+          </View>
+
+          <Text style={styles.userName}>{displayName}</Text>
+          <Text style={styles.userEmail}>{displayEmail}</Text>
+          <View style={styles.rolePill}>
+            <Ionicons name={'ribbon'} size={15} color={'#F5A623'} />
+            <Text style={styles.roleText}>{roleForLevel(level)}</Text>
+          </View>
+
+          <View style={styles.xpBlock}>
+            <View style={styles.xpLabels}>
+              <Text style={styles.xpLabel}>Nível {level}</Text>
+              <Text style={styles.xpValue}>
+                {currentLevelXp} / {XP_PER_LEVEL} XP
+              </Text>
+            </View>
+            <View style={styles.progressTrack}>
+              <View style={[styles.xpFill, { width: xpPercent + '%' }]} />
+            </View>
+            <Text style={styles.nextLevel}>
+              Faltam {XP_PER_LEVEL - currentLevelXp} XP para o próximo nível
+            </Text>
+          </View>
+
+          <View style={styles.walletRow}>
+            <View style={styles.walletItem}>
+              <Ionicons name={'flame'} size={19} color={'#FF8A1F'} />
+              <Text style={styles.walletValue}>{streak}</Text>
+              <Text style={styles.walletLabel}>dias</Text>
+            </View>
+            <View style={styles.walletDivider} />
+            <View style={styles.walletItem}>
+              <Ionicons name={'cash'} size={19} color={'#D99B00'} />
+              <Text style={styles.walletValue}>{formatNumber(coins)}</Text>
+              <Text style={styles.walletLabel}>moedas</Text>
+            </View>
+            <View style={styles.walletDivider} />
+            <View style={styles.walletItem}>
+              <Ionicons name={'diamond'} size={18} color={'#1CB0F6'} />
+              <Text style={styles.walletValue}>{formatNumber(diamonds)}</Text>
+              <Text style={styles.walletLabel}>diamantes</Text>
+            </View>
+          </View>
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-          {/* Card do Escoteiro */}
-          <View style={styles.profileCard}>
-            <View style={styles.avatarSection}>
-              <View style={styles.avatarCircle}>
-                <Ionicons name="person" size={48} color="#2E7D32" />
-              </View>
-              <View style={styles.badgeLevel}>
-                <Text style={styles.badgeLevelText}>{scoutLevel.level}</Text>
-              </View>
-            </View>
+        <View style={styles.sectionHeading}>
+          <View>
+            <Text style={styles.sectionEyebrow}>SUA JORNADA</Text>
+            <Text style={styles.sectionTitle}>Progresso nos 9 biomas</Text>
+          </View>
+          <View style={styles.percentPill}>
+            <Text style={styles.percentPillText}>
+              {Math.round(journeyProgress.percent || 0)}%
+            </Text>
+          </View>
+        </View>
 
-            <Text style={styles.userName}>{user?.nome || 'Escoteiro Biome'}</Text>
-            <Text style={styles.userRole}>{scoutLevel.icon} {scoutLevel.title}</Text>
-
-            {/* Barra de XP */}
-            <View style={styles.xpSection}>
-              <View style={styles.xpRow}>
-                <Text style={styles.xpLabel}>Experiência (XP)</Text>
-                <Text style={styles.xpValue}>
-                  {xpProgression.current} / {xpProgression.total} XP
+        <View style={styles.biomeList}>
+          {biomeSummaries.map((biome) => (
+            <View
+              key={biome.id}
+              style={[
+                styles.biomeCard,
+                !biome.unlocked && styles.biomeCardLocked,
+              ]}
+            >
+              <View
+                style={[
+                  styles.biomeIcon,
+                  { backgroundColor: biome.theme?.soft || '#E8F4E1' },
+                ]}
+              >
+                <Text style={styles.biomeEmoji}>
+                  {biome.unlocked ? biome.emoji : '🔒'}
                 </Text>
               </View>
-              <View style={styles.xpBarBackground}>
-                <View
-                  style={[
-                    styles.xpBarFill,
-                    { width: `${Math.min(100, Math.max(8, xpProgression.progress * 100))}%` },
-                  ]}
-                />
-              </View>
-            </View>
-
-            {/* Estatísticas Rápidas */}
-            <View style={styles.statsRow}>
-              <View style={styles.statBox}>
-                <Text style={styles.statIcon}>🪙</Text>
-                <Text style={styles.statNumber}>{coins}</Text>
-                <Text style={styles.statLabel}>Moedas</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={styles.statIcon}>💎</Text>
-                <Text style={styles.statNumber}>5</Text>
-                <Text style={styles.statLabel}>Diamantes</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={styles.statIcon}>🔥</Text>
-                <Text style={styles.statNumber}>{dailyStreak}d</Text>
-                <Text style={styles.statLabel}>Expedição</Text>
-              </View>
-            </View>
-          </View>
-
-          {/* 1. SEÇÃO: CONQUISTAS */}
-          <View style={styles.sectionCard}>
-            <View style={styles.sectionHeader}>
-              <Ionicons name="trophy" size={20} color="#F57C00" />
-              <Text style={styles.sectionTitle}>Conquistas da Expedição</Text>
-            </View>
-
-            {achievements.map((item) => (
-              <View
-                key={item.id}
-                style={[styles.achievementItem, item.completed && styles.achievementItemCompleted]}
-              >
-                <View
-                  style={[
-                    styles.achievementIconCircle,
-                    item.completed ? styles.achievementIconDone : styles.achievementIconPending,
-                  ]}
-                >
-                  <Ionicons
-                    name={item.icon}
-                    size={20}
-                    color={item.completed ? '#FFF' : '#9E9E9E'}
+              <View style={styles.biomeCopy}>
+                <View style={styles.biomeTitleRow}>
+                  <Text style={styles.biomeName}>{biome.name}</Text>
+                  <Text
+                    style={[
+                      styles.biomePercent,
+                      { color: biome.theme?.dark || '#245C16' },
+                    ]}
+                  >
+                    {biome.percent}%
+                  </Text>
+                </View>
+                <View style={styles.biomeMetaRow}>
+                  <Text style={styles.biomeMeta}>{biome.lessons}/25 níveis</Text>
+                  <Text style={styles.biomeMeta}>
+                    {biome.nodes}/{biome.totalNodes} atributos
+                  </Text>
+                </View>
+                <View style={styles.biomeProgressTrack}>
+                  <View
+                    style={[
+                      styles.biomeProgressFill,
+                      {
+                        width: biome.percent + '%',
+                        backgroundColor: biome.theme?.primary || '#58CC02',
+                      },
+                    ]}
                   />
                 </View>
-                <View style={styles.achievementInfo}>
-                  <Text style={styles.achievementName}>{item.title}</Text>
-                  <Text style={styles.achievementDesc}>{item.description}</Text>
-                </View>
-                <View style={styles.achievementReward}>
-                  {item.completed ? (
-                    <Ionicons name="checkmark-circle" size={24} color="#2E7D32" />
-                  ) : (
-                    <Text style={styles.rewardText}>{item.reward}</Text>
-                  )}
-                </View>
               </View>
-            ))}
+              {biome.complete ? (
+                <Ionicons name={'checkmark-circle'} size={22} color={'#43A047'} />
+              ) : null}
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.sectionHeading}>
+          <View>
+            <Text style={styles.sectionEyebrow}>EM NÚMEROS</Text>
+            <Text style={styles.sectionTitle}>Estatísticas da expedição</Text>
+          </View>
+        </View>
+
+        <View style={styles.statsGrid}>
+          {profileStats.map((item) => (
+            <View key={item.label} style={styles.statCard}>
+              <Ionicons name={item.icon} size={20} color={'#3F9700'} />
+              <Text style={styles.statValue}>{item.value}</Text>
+              <Text style={styles.statLabel}>{item.label}</Text>
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.sectionHeading}>
+          <View>
+            <Text style={styles.sectionEyebrow}>CONQUISTAS</Text>
+            <Text style={styles.sectionTitle}>Marcos do explorador</Text>
+          </View>
+          <View style={styles.achievementCount}>
+            <Ionicons name={'trophy'} size={15} color={'#D98C00'} />
+            <Text style={styles.achievementCountText}>
+              {completedAchievements}/{achievements.length}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.achievementList}>
+          {achievements.map((achievement) => (
+            <View
+              key={achievement.id}
+              style={[
+                styles.achievementCard,
+                achievement.complete && styles.achievementCardComplete,
+              ]}
+            >
+              <View
+                style={[
+                  styles.achievementIcon,
+                  achievement.complete && styles.achievementIconComplete,
+                ]}
+              >
+                <Ionicons
+                  name={achievement.complete ? achievement.icon : 'lock-closed'}
+                  size={20}
+                  color={achievement.complete ? '#FFFFFF' : '#8B9988'}
+                />
+              </View>
+              <View style={styles.achievementCopy}>
+                <Text style={styles.achievementTitle}>{achievement.title}</Text>
+                <Text style={styles.achievementDescription}>
+                  {achievement.description}
+                </Text>
+              </View>
+              {achievement.complete ? (
+                <Ionicons name={'checkmark-circle'} size={22} color={'#43A047'} />
+              ) : null}
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.accountCard}>
+          <View style={styles.accountHeading}>
+            <Ionicons name={'settings'} size={20} color={'#687A65'} />
+            <Text style={styles.accountTitle}>Conta e progresso</Text>
           </View>
 
-          {/* 2. SEÇÃO: ACESSIBILIDADE */}
-          <View style={styles.sectionCard}>
-            <View style={styles.sectionHeader}>
-              <Ionicons name="accessibility" size={20} color="#1976D2" />
-              <Text style={styles.sectionTitle}>Acessibilidade e Inclusão</Text>
+          <Pressable
+            accessibilityRole={'button'}
+            onPress={handleReset}
+            style={({ pressed }) => [styles.resetButton, pressed && styles.pressed]}
+          >
+            <Ionicons name={'refresh'} size={20} color={'#B45A00'} />
+            <View style={styles.actionCopy}>
+              <Text style={styles.resetButtonText}>Recomeçar progresso</Text>
+              <Text style={styles.actionHint}>Apaga a expedição salva neste dispositivo</Text>
             </View>
-
-            <View style={styles.optionRow}>
-              <View style={styles.optionInfo}>
-                <Text style={styles.optionLabel}>Leitura em Voz Alta (TTS)</Text>
-                <Text style={styles.optionDesc}>Narração automática de textos e quizzes</Text>
-              </View>
-              <Switch
-                value={ttsEnabled}
-                onValueChange={setTtsEnabled}
-                trackColor={{ false: '#CFD8DC', true: '#81C784' }}
-                thumbColor={ttsEnabled ? '#2E7D32' : '#ECEFF1'}
-              />
-            </View>
-
-            <View style={styles.optionRow}>
-              <View style={styles.optionInfo}>
-                <Text style={styles.optionLabel}>Modo Alto Contraste</Text>
-                <Text style={styles.optionDesc}>Contorno e cores nítidas para fácil leitura</Text>
-              </View>
-              <Switch
-                value={highContrast}
-                onValueChange={setHighContrast}
-                trackColor={{ false: '#CFD8DC', true: '#81C784' }}
-                thumbColor={highContrast ? '#2E7D32' : '#ECEFF1'}
-              />
-            </View>
-
-            <View style={styles.optionRow}>
-              <View style={styles.optionInfo}>
-                <Text style={styles.optionLabel}>Tamanho de Texto Aumentado</Text>
-                <Text style={styles.optionDesc}>Letras maiores e mais espaçadas</Text>
-              </View>
-              <Switch
-                value={largeFont}
-                onValueChange={setLargeFont}
-                trackColor={{ false: '#CFD8DC', true: '#81C784' }}
-                thumbColor={largeFont ? '#2E7D32' : '#ECEFF1'}
-              />
-            </View>
-
-            <View style={styles.optionRow}>
-              <View style={styles.optionInfo}>
-                <Text style={styles.optionLabel}>Efeitos Sonoros (SFX)</Text>
-                <Text style={styles.optionDesc}>Sons de animais, cliques e recompensas</Text>
-              </View>
-              <Switch
-                value={sfxEnabled}
-                onValueChange={setSfxEnabled}
-                trackColor={{ false: '#CFD8DC', true: '#81C784' }}
-                thumbColor={sfxEnabled ? '#2E7D32' : '#ECEFF1'}
-              />
-            </View>
-
-            <View style={styles.optionRow}>
-              <View style={styles.optionInfo}>
-                <Text style={styles.optionLabel}>Música Ambiente da Selva</Text>
-                <Text style={styles.optionDesc}>Trilha sonora relaxante nos biomas</Text>
-              </View>
-              <Switch
-                value={musicEnabled}
-                onValueChange={setMusicEnabled}
-                trackColor={{ false: '#CFD8DC', true: '#81C784' }}
-                thumbColor={musicEnabled ? '#2E7D32' : '#ECEFF1'}
-              />
-            </View>
-          </View>
-
-          {/* 3. SEÇÃO: CONFIGURAÇÕES E SISTEMA */}
-          <View style={styles.sectionCard}>
-            <View style={styles.sectionHeader}>
-              <Ionicons name="settings" size={20} color="#546E7A" />
-              <Text style={styles.sectionTitle}>Configurações do Jogo</Text>
-            </View>
-
-            <View style={styles.optionRow}>
-              <View style={styles.optionInfo}>
-                <Text style={styles.optionLabel}>Notificações Diárias</Text>
-                <Text style={styles.optionDesc}>Lembrar de alimentar os animais resgatados</Text>
-              </View>
-              <Switch
-                value={notificationsEnabled}
-                onValueChange={setNotificationsEnabled}
-                trackColor={{ false: '#CFD8DC', true: '#81C784' }}
-                thumbColor={notificationsEnabled ? '#2E7D32' : '#ECEFF1'}
-              />
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoRowLabel}>Versão do Jogo</Text>
-              <Text style={styles.infoRowValue}>BiomeKids v1.2 Educativo</Text>
-            </View>
-          </View>
-
-          {/* 4. BOTÃO DE LOGOUT */}
-          <Pressable style={styles.logoutBtn} onPress={handleLogout}>
-            <Ionicons name="log-out-outline" size={22} color="#D32F2F" />
-            <Text style={styles.logoutBtnText}>Sair da Conta</Text>
+            <Ionicons name={'chevron-forward'} size={18} color={'#B45A00'} />
           </Pressable>
 
-          <View style={styles.footerSpacing} />
-        </ScrollView>
-      </SafeAreaView>
-    </ImageBackground>
+          <Pressable
+            accessibilityRole={'button'}
+            onPress={handleLogout}
+            style={({ pressed }) => [styles.logoutButton, pressed && styles.pressed]}
+          >
+            <Ionicons name={'log-out-outline'} size={20} color={'#D94343'} />
+            <View style={styles.actionCopy}>
+              <Text style={styles.logoutButtonText}>Sair da conta</Text>
+              <Text style={styles.actionHint}>Voltar para a tela inicial</Text>
+            </View>
+            <Ionicons name={'chevron-forward'} size={18} color={'#D94343'} />
+          </Pressable>
+        </View>
+
+        <Text style={styles.version}>BiomeKids · versão educativa 2.0</Text>
+      </ScrollView>
+
+      <BottomNavBar activeTab={'Perfil'} />
+    </AppBackground>
   );
 }

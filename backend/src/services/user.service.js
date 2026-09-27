@@ -39,23 +39,7 @@ class UserService {
       throw error;
     }
 
-    // 2. Progresso de Quizzes
-    const quizResult = await db.query(
-      `SELECT q.title, q.territorio_id, uqp.score, uqp.completed, uqp.completed_at
-       FROM user_quiz_progress uqp
-       JOIN quizzes q ON q.id = uqp.quiz_id
-       WHERE uqp.user_id = $1`,
-      [userId]
-    );
-
-    // 3. Habitat Isométrico
-    const habitatResult = await db.query(
-      `SELECT grid_data, last_watered_at, last_fed_at, updated_at
-       FROM habitats WHERE user_id = $1`,
-      [userId]
-    );
-
-    // 4. Selos e Conquistas
+    // 2. Selos e conquistas vinculados à conta.
     const badgesResult = await db.query(
       `SELECT b.name, b.description, ub.unlocked_at
        FROM user_badges ub
@@ -64,7 +48,7 @@ class UserService {
       [userId]
     );
 
-    // 5. Histórico de Consentimento LGPD
+    // 3. Histórico de consentimento LGPD.
     const consentResult = await db.query(
       `SELECT action, terms_version, created_at
        FROM lgpd_consent_log WHERE user_id = $1 ORDER BY created_at DESC`,
@@ -87,8 +71,6 @@ class UserService {
       exportedAt: new Date().toISOString(),
       legalNotice: 'Relatório gerado em conformidade com o Artigo 18 da Lei Geral de Proteção de Dados (LGPD).',
       userData: userResult.rows[0],
-      quizProgress: quizResult.rows,
-      habitat: habitatResult.rows[0] || null,
       badges: badgesResult.rows,
       consentHistory: consentResult.rows,
     };
@@ -104,7 +86,7 @@ class UserService {
       await client.query('BEGIN');
 
       // 1. Anonimiza os dados sensíveis e marca deleted_at
-      const anonymizedEmail = `anon_${userId.substring(0, 8)}@deleted.zookids.app`;
+      const anonymizedEmail = `anon_${userId.substring(0, 8)}@deleted.biomekids.app`;
       const anonymizedName = 'Usuário Anonimizado';
 
       await client.query(

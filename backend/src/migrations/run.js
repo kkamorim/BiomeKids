@@ -17,13 +17,8 @@ async function runMigrations() {
     console.log('   - users (com campos LGPD)');
     console.log('   - refresh_tokens');
     console.log('   - lgpd_consent_log');
-    console.log('   - species');
-    console.log('   - quizzes');
-    console.log('   - user_quiz_progress');
-    console.log('   - habitats (com JSONB + Índice GIN)');
-    console.log('   - scout_photos');
     console.log('   - badges & user_badges');
-    console.log('🏁 Banco de dados do ZooKids pronto para uso!');
+    console.log('🏁 Banco de dados do BiomeKids pronto para uso!');
   } catch (err) {
     console.error('❌ Erro ao executar migrações:', err.message);
     process.exit(1);

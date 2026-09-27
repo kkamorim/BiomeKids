@@ -2,8 +2,8 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 require('dotenv').config();
 
-const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'dev_access_secret_zookids_2026';
-const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'dev_refresh_secret_zookids_2026';
+const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'dev_access_secret_biomekids_2026';
+const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'dev_refresh_secret_biomekids_2026';
 const ACCESS_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN || '15m';
 const REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
 

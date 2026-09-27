@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Image,
@@ -19,43 +19,35 @@ const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
 export default function Carregar() {
   const navigation = useNavigation();
-  const { checkAuth } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const progress = useRef(new Animated.Value(0)).current;
   const isNavigating = useRef(false);
+  const [animationFinished, setAnimationFinished] = useState(false);
 
   useEffect(() => {
-    // Inicia a checagem de autenticação silenciosa em paralelo
-    const authPromise = checkAuth();
-
     // Anima a barra de progresso do início até 100%
     const animation = Animated.timing(progress, {
       toValue: 1,
-      duration: 4000,
+      duration: 2200,
       easing: Easing.bezier(0.25, 0.1, 0.25, 1),
       useNativeDriver: false,
     });
 
-    animation.start(async ({ finished }) => {
-      // SÓ redireciona se a animação realmente tiver completado 100%
-      if (finished && !isNavigating.current) {
-        isNavigating.current = true;
-        const isLogged = await authPromise;
-
-        // Pausa de 350ms com a barra cheia para sensação de conclusão
-        setTimeout(() => {
-          if (isLogged) {
-            navigation.replace('Biomas');
-          } else {
-            navigation.replace('Home');
-          }
-        }, 350);
-      }
-    });
+    animation.start(({ finished }) => setAnimationFinished(Boolean(finished)));
 
     return () => {
       animation.stop();
     };
-  }, []); // Executa exatamente uma vez na montagem da tela
+  }, [progress]);
+
+  useEffect(() => {
+    if (!animationFinished || isLoading || isNavigating.current) return undefined;
+    isNavigating.current = true;
+    const timer = setTimeout(() => {
+      navigation.replace(isAuthenticated ? 'Journey' : 'Home');
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [animationFinished, isAuthenticated, isLoading, navigation]);
 
 
 
