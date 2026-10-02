@@ -10,6 +10,7 @@ import Cadastro from './src/Pages/Cadastro';
 import Entrar from './src/Pages/Entrar';
 import Journey from './src/Pages/Journey';
 import Lesson from './src/Pages/Lesson';
+import Expedition from './src/Pages/Expedition';
 import Evolution from './src/Pages/Evolution';
 import Transition from './src/Pages/Transition';
 import Biomas from './src/Pages/Biomas';
@@ -48,6 +49,7 @@ export default function App() {
 
             <Stack.Screen name={'Journey'} component={Journey} />
             <Stack.Screen name={'Lesson'} component={Lesson} options={{ animation: 'slide_from_right' }} />
+            <Stack.Screen name={'Expedition'} component={Expedition} options={{ animation: 'fade' }} />
             <Stack.Screen name={'Evolution'} component={Evolution} options={{ animation: 'slide_from_bottom' }} />
             <Stack.Screen name={'Transition'} component={Transition} options={{ animation: 'fade' }} />
             <Stack.Screen name={'Biomas'} component={Biomas} />

@@ -25,6 +25,9 @@ export function AppBackground({
   ...gradientProps
 }) {
   const resolvedColors = customColors || gradientColors || gradients.app;
+  const contourOne = decorationColors[0] || palette.moss;
+  const contourTwo = decorationColors[1] || palette.river;
+  const marginColor = decorationColors[2] || palette.clay;
   const content = (
     <View
       style={[
@@ -51,43 +54,45 @@ export function AppBackground({
           importantForAccessibility={'no-hide-descendants'}
           style={StyleSheet.absoluteFill}
         >
+          <View style={[styles.paperWash, { backgroundColor: alpha(palette.paper, 0.18) }]} />
+          <View style={[styles.marginLine, { backgroundColor: alpha(marginColor, 0.24) }]} />
+          <View style={[styles.marginTick, { backgroundColor: alpha(marginColor, 0.2) }]} />
+
           <View
             style={[
-              styles.orb,
-              styles.orbTop,
-              { backgroundColor: alpha(decorationColors[0] || palette.primary, 0.1) },
+              styles.contour,
+              styles.contourTopOuter,
+              { borderColor: alpha(contourOne, 0.11) },
             ]}
           />
           <View
             style={[
-              styles.orb,
-              styles.orbRight,
-              { backgroundColor: alpha(decorationColors[1] || palette.secondary, 0.09) },
+              styles.contour,
+              styles.contourTopMiddle,
+              { borderColor: alpha(contourOne, 0.1) },
             ]}
           />
           <View
             style={[
-              styles.orb,
-              styles.orbBottom,
-              { backgroundColor: alpha(decorationColors[2] || palette.warning, 0.08) },
+              styles.contour,
+              styles.contourTopInner,
+              { borderColor: alpha(contourOne, 0.09) },
             ]}
           />
-          <View style={[styles.sprout, styles.sproutLeft]}>
-            <View
-              style={[
-                styles.leaf,
-                styles.leafLeft,
-                { backgroundColor: alpha(decorationColors[0] || palette.primary, 0.12) },
-              ]}
-            />
-            <View
-              style={[
-                styles.leaf,
-                styles.leafRight,
-                { backgroundColor: alpha(decorationColors[1] || palette.secondary, 0.1) },
-              ]}
-            />
-          </View>
+          <View
+            style={[
+              styles.contour,
+              styles.contourBottomOuter,
+              { borderColor: alpha(contourTwo, 0.1) },
+            ]}
+          />
+          <View
+            style={[
+              styles.contour,
+              styles.contourBottomInner,
+              { borderColor: alpha(contourTwo, 0.09) },
+            ]}
+          />
         </View>
       ) : null}
 
@@ -116,54 +121,63 @@ const styles = StyleSheet.create({
     width: '100%',
     alignSelf: 'center',
   },
-  orb: {
+  paperWash: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  marginLine: {
     position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 25,
+    width: 1,
+  },
+  marginTick: {
+    position: 'absolute',
+    top: 92,
+    left: 17,
+    width: 17,
+    height: 1,
+  },
+  contour: {
+    position: 'absolute',
+    borderWidth: 1,
     borderRadius: radius.round,
+    backgroundColor: palette.transparent,
   },
-  orbTop: {
-    width: 280,
-    height: 280,
-    top: -150,
-    right: -80,
+  contourTopOuter: {
+    width: 370,
+    height: 205,
+    top: -91,
+    right: -178,
+    transform: [{ rotate: '-10deg' }],
   },
-  orbRight: {
-    width: 180,
-    height: 180,
-    top: '36%',
-    right: -105,
+  contourTopMiddle: {
+    width: 300,
+    height: 158,
+    top: -66,
+    right: -143,
+    transform: [{ rotate: '-10deg' }],
   },
-  orbBottom: {
-    width: 240,
-    height: 240,
-    bottom: -145,
-    left: -90,
+  contourTopInner: {
+    width: 226,
+    height: 112,
+    top: -41,
+    right: -104,
+    transform: [{ rotate: '-10deg' }],
   },
-  sprout: {
-    position: 'absolute',
-    width: 94,
-    height: 86,
+  contourBottomOuter: {
+    width: 330,
+    height: 190,
+    right: -205,
+    bottom: 74,
+    transform: [{ rotate: '15deg' }],
   },
-  sproutLeft: {
-    left: -24,
-    top: '18%',
-    transform: [{ rotate: '-12deg' }],
-  },
-  leaf: {
-    position: 'absolute',
-    width: 58,
-    height: 34,
-    borderTopLeftRadius: 32,
-    borderBottomRightRadius: 32,
-  },
-  leafLeft: {
-    left: 0,
-    bottom: 8,
-    transform: [{ rotate: '25deg' }],
-  },
-  leafRight: {
-    right: 0,
-    top: 8,
-    transform: [{ rotate: '-145deg' }],
+  contourBottomInner: {
+    width: 248,
+    height: 136,
+    right: -162,
+    bottom: 102,
+    transform: [{ rotate: '15deg' }],
   },
 });
 

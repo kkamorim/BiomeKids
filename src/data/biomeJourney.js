@@ -21,6 +21,47 @@ const node = (key, name, category, icon, description, cost, pps, tapBonus, level
   key, name, category, icon, description, cost, pps, tapBonus, level, parent,
 });
 
+const careChallenge = (
+  biomeId,
+  key,
+  title,
+  icon,
+  problem,
+  sign,
+  action,
+  learning,
+  requiredLocalLevel,
+  requiredNodeKey,
+  requiredScans,
+  metric,
+  reward,
+  collectionEmoji
+) => {
+  const id = `${biomeId}-${key}`;
+  return {
+    id,
+    title,
+    icon,
+    problem,
+    sign,
+    action,
+    learning,
+    requiredLocalLevel,
+    requiredNodeId: `${biomeId}-${requiredNodeKey}`,
+    requiredScans,
+    metric,
+    reward,
+    collectionItem: {
+      id: `${id}-registro`,
+      name: title,
+      emoji: collectionEmoji,
+      category: 'care',
+      biomeId,
+      description: learning,
+    },
+  };
+};
+
 const BIOME_BLUEPRINTS = [
   {
     id: 'floresta-tropical', name: 'Floresta Tropical', shortName: 'Floresta', emoji: '🌴', theme: THEMES.tropical,
@@ -195,6 +236,198 @@ const BIOME_BLUEPRINTS = [
   },
 ];
 
+export const CARE_BLUEPRINTS = Object.freeze({
+  'floresta-tropical': [
+    careChallenge(
+      'floresta-tropical', 'mata-ciliar', 'Proteger o igarapé', 'water-outline',
+      'A retirada da vegetação deixou a margem vulnerável à erosão.',
+      'Água turva, raízes expostas e menos anfíbios aparecem depois da chuva.',
+      'Recupere a mata ciliar com plantas nativas e acompanhe a transparência da água.',
+      'Raízes seguram o solo, filtram sedimentos e mantêm o igarapé como abrigo para muitas espécies.',
+      5, 'solo-vivo', 3, 'waterQuality',
+      { coins: 90, xp: 70, ecoPoints: 120 }, '💧'
+    ),
+    careChallenge(
+      'floresta-tropical', 'corredor-florestal', 'Reconectar as copas', 'git-network-outline',
+      'Uma clareira larga separou grupos de árvores e isolou animais arborícolas.',
+      'Há poucos frutos dispersos e os primatas evitam atravessar a área aberta.',
+      'Crie um corredor de vegetação nativa entre os dois fragmentos.',
+      'Corredores ecológicos permitem deslocamento, reprodução e dispersão de sementes.',
+      15, 'primatas', 4, 'habitatConnectivity',
+      { coins: 125, xp: 100, ecoPoints: 180 }, '🌳'
+    ),
+    careChallenge(
+      'floresta-tropical', 'silencio-noturno', 'Devolver a noite à floresta', 'moon-outline',
+      'Luz e ruído próximos da mata alteraram a rotina da fauna noturna.',
+      'Pegadas desaparecem perto das áreas iluminadas e predadores mudam suas rotas.',
+      'Reduza a iluminação, delimite uma zona silenciosa e monitore o retorno dos animais.',
+      'Escuridão e silêncio também são partes do habitat e orientam caça, fuga e reprodução.',
+      20, 'onca', 5, 'nocturnalBalance',
+      { coins: 160, xp: 130, ecoPoints: 230, diamonds: 1 }, '🌙'
+    ),
+  ],
+  alagados: [
+    careChallenge(
+      'alagados', 'agua-turva', 'Investigar a água turva', 'water-outline',
+      'Sedimentos e nutrientes em excesso estão reduzindo a qualidade da água.',
+      'A água perdeu transparência, há algas demais e poucos pequenos animais nas margens.',
+      'Identifique a origem do escoamento e recupere a vegetação que filtra a água.',
+      'Água limpa depende do que acontece em toda a margem e também rio acima.',
+      5, 'algas', 3, 'waterQuality',
+      { coins: 95, xp: 75, ecoPoints: 125 }, '🫧'
+    ),
+    careChallenge(
+      'alagados', 'reconectar-cheias', 'Restaurar o pulso das cheias', 'repeat-outline',
+      'Um canal bloqueado impediu a água de alcançar lagoas e campos sazonais.',
+      'Peixes ficam isolados e áreas que deveriam alagar permanecem secas.',
+      'Reconecte o fluxo com segurança e monitore dois ciclos de cheia e vazante.',
+      'O pulso das águas transporta nutrientes, conecta habitats e organiza a vida dos alagados.',
+      25, 'pulso-cheias', 5, 'floodConnectivity',
+      { coins: 175, xp: 140, ecoPoints: 250, diamonds: 1 }, '🌊'
+    ),
+  ],
+  savana: [
+    careChallenge(
+      'savana', 'solo-superpastejado', 'Recuperar o campo cansado', 'leaf-outline',
+      'Pastejo intenso deixou grandes trechos sem cobertura vegetal.',
+      'Solo exposto, capim muito baixo e menos insetos aparecem perto das rotas das manadas.',
+      'Proteja áreas de descanso e favoreça o rebrote das gramíneas nativas.',
+      'O pastejo pode renovar o campo, mas intensidade e tempo de recuperação precisam estar em equilíbrio.',
+      10, 'herbivoros', 4, 'soilCover',
+      { coins: 105, xp: 85, ecoPoints: 145 }, '🌾'
+    ),
+    careChallenge(
+      'savana', 'fogo-fora-de-ritmo', 'Compreender o fogo', 'flame-outline',
+      'Queimadas muito frequentes não dão tempo para plantas e animais se recuperarem.',
+      'Árvores jovens desaparecem e o solo permanece descoberto por mais tempo.',
+      'Investigue frequência e intensidade e escolha um plano de prevenção e manejo especializado.',
+      'O efeito do fogo depende do bioma, da estação, da intensidade e do intervalo entre eventos.',
+      25, 'ciclo-fogo', 5, 'fireBalance',
+      { coins: 185, xp: 145, ecoPoints: 260, diamonds: 1 }, '🔥'
+    ),
+  ],
+  deserto: [
+    careChallenge(
+      'deserto', 'crosta-do-solo', 'Proteger o chão vivo', 'footsteps-outline',
+      'Passagens fora das trilhas quebraram a frágil crosta biológica do solo.',
+      'Marcas profundas, poeira solta e menos líquens aparecem nas áreas pisoteadas.',
+      'Delimite rotas, proteja o solo intacto e acompanhe sua lenta regeneração.',
+      'Mesmo parecendo vazio, o solo desértico abriga organismos que reduzem erosão e guardam nutrientes.',
+      5, 'liquens', 3, 'soilIntegrity',
+      { coins: 100, xp: 80, ecoPoints: 135 }, '🪨'
+    ),
+    careChallenge(
+      'deserto', 'uso-da-agua', 'Guardar cada gota', 'water-outline',
+      'A retirada excessiva de água reduziu pequenas fontes usadas pela fauna.',
+      'Bebedouros naturais secam mais cedo e pegadas se concentram em poucos pontos.',
+      'Reduza perdas, proteja as fontes e monitore o consumo durante os períodos mais quentes.',
+      'Em ambientes secos, economizar água e proteger fontes naturais sustenta toda a comunidade.',
+      20, 'dromedario', 5, 'waterSecurity',
+      { coins: 170, xp: 135, ecoPoints: 240, diamonds: 1 }, '💧'
+    ),
+  ],
+  pradarias: [
+    careChallenge(
+      'pradarias', 'solo-exposto', 'Cobrir novamente o solo', 'earth-outline',
+      'A remoção das gramíneas deixou o solo fértil exposto ao vento e à chuva.',
+      'Poeira, pequenos sulcos e raízes descobertas avançam pelo campo.',
+      'Recupere gramíneas nativas e mantenha restos vegetais protegendo o chão.',
+      'Raízes profundas e cobertura vegetal conservam água, carbono e nutrientes no solo.',
+      5, 'gramineas', 3, 'soilCover',
+      { coins: 105, xp: 85, ecoPoints: 145 }, '🌱'
+    ),
+    careChallenge(
+      'pradarias', 'rotas-fragmentadas', 'Abrir caminho para as manadas', 'navigate-outline',
+      'Barreiras dividiram áreas de alimento, água e reprodução.',
+      'Trilhas terminam de repente e os pastadores se acumulam em pequenos trechos.',
+      'Reconecte passagens seguras e monitore o retorno das rotas sazonais.',
+      'Animais migratórios precisam circular entre recursos que mudam ao longo do ano.',
+      15, 'pastadores', 4, 'habitatConnectivity',
+      { coins: 145, xp: 115, ecoPoints: 205 }, '🦬'
+    ),
+  ],
+  'floresta-temperada': [
+    careChallenge(
+      'floresta-temperada', 'riacho-com-lixo', 'Limpar sem esquecer a origem', 'trash-outline',
+      'Resíduos chegaram ao riacho e ameaçam animais e plantas das margens.',
+      'Embalagens ficam presas nos galhos e a água acumula material depois da chuva.',
+      'Retire os resíduos, identifique de onde vieram e previna uma nova entrada.',
+      'Limpar ajuda no momento, mas impedir que o lixo alcance a água resolve a causa do problema.',
+      5, 'carvalhos', 3, 'waterQuality',
+      { coins: 110, xp: 90, ecoPoints: 150 }, '♻️'
+    ),
+    careChallenge(
+      'floresta-temperada', 'noites-iluminadas', 'Criar uma noite segura', 'moon-outline',
+      'Iluminação excessiva na borda da floresta alterou o comportamento noturno.',
+      'Insetos se concentram nas lâmpadas e raposas evitam corredores muito claros.',
+      'Direcione as luzes para baixo, reduza sua intensidade e preserve corredores escuros.',
+      'Poluição luminosa muda orientação, alimentação e reprodução de muitas espécies.',
+      15, 'raposas', 4, 'nocturnalBalance',
+      { coins: 150, xp: 120, ecoPoints: 210 }, '🦊'
+    ),
+  ],
+  taiga: [
+    careChallenge(
+      'taiga', 'solo-compactado', 'Cuidar do chão da taiga', 'footsteps-outline',
+      'Tráfego repetido compactou o solo úmido entre musgos e coníferas.',
+      'Poças permanecem na superfície, raízes ficam expostas e musgos desaparecem.',
+      'Feche atalhos, concentre a passagem em trilhas e proteja a regeneração natural.',
+      'Solo compactado recebe menos ar e água, dificultando o crescimento de raízes e pequenos organismos.',
+      5, 'coniferas', 3, 'soilIntegrity',
+      { coins: 115, xp: 90, ecoPoints: 155 }, '🌲'
+    ),
+    careChallenge(
+      'taiga', 'corredor-migratorio', 'Reconectar a rota da floresta', 'git-network-outline',
+      'Uma abertura extensa separou áreas usadas por predadores e grandes manadas.',
+      'Pegadas contornam longas distâncias e encontros com alimento ficam menos frequentes.',
+      'Proteja uma faixa contínua de floresta e acompanhe as rotas com câmeras de campo.',
+      'Conectividade reduz isolamento e permite que animais acompanhem alimento e estações.',
+      20, 'lobos', 5, 'habitatConnectivity',
+      { coins: 180, xp: 140, ecoPoints: 250, diamonds: 1 }, '🐾'
+    ),
+  ],
+  tundra: [
+    careChallenge(
+      'tundra', 'vegetacao-pisoteada', 'Proteger o jardim rasteiro', 'flower-outline',
+      'Passagens repetidas danificaram plantas que crescem muito devagar.',
+      'Líquens quebrados e trilhas de solo escuro permanecem visíveis por muito tempo.',
+      'Desvie a circulação e proteja as áreas onde a vegetação ainda está se recuperando.',
+      'Na tundra, a estação de crescimento é curta e pequenos danos podem levar anos para desaparecer.',
+      5, 'arbustos-anoes', 3, 'vegetationCover',
+      { coins: 120, xp: 95, ecoPoints: 160 }, '🌿'
+    ),
+    careChallenge(
+      'tundra', 'permafrost-exposto', 'Manter o solo protegido', 'snow-outline',
+      'A perda de cobertura deixou o solo congelado mais exposto ao aquecimento.',
+      'O terreno afunda em pontos úmidos e novas poças aparecem onde o gelo do solo cedeu.',
+      'Proteja a vegetação, limite novas perturbações e monitore temperatura e umidade.',
+      'O permafrost guarda carbono antigo; protegê-lo melhora a resistência local, sem substituir ações climáticas amplas.',
+      25, 'permafrost', 5, 'permafrostProtection',
+      { coins: 195, xp: 150, ecoPoints: 275, diamonds: 1 }, '🧊'
+    ),
+  ],
+  oceanos: [
+    careChallenge(
+      'oceanos', 'plastico-costeiro', 'Interromper o caminho do plástico', 'trash-outline',
+      'Resíduos vindos da costa estão alcançando águas usadas por peixes e tartarugas.',
+      'Fragmentos aparecem entre algas e nas linhas deixadas pela maré.',
+      'Retire o material com segurança, rastreie sua origem e impeça novas entradas.',
+      'Grande parte do cuidado marinho começa em terra, antes que o resíduo chegue à água.',
+      5, 'algas', 4, 'marinePollution',
+      { coins: 125, xp: 100, ecoPoints: 170 }, '🌊'
+    ),
+    careChallenge(
+      'oceanos', 'rede-fantasma', 'Libertar a rota marinha', 'fish-outline',
+      'Uma rede abandonada continua prendendo animais mesmo sem pescadores por perto.',
+      'Marcas na rede, movimentos incomuns e animais evitando a área indicam perigo.',
+      'Sinalize o local, acione uma equipe especializada e monitore a passagem após a retirada.',
+      'Equipamentos perdidos continuam capturando fauna; prevenção e recolhimento especializado salvam vidas.',
+      15, 'tartarugas', 5, 'wildlifeSafety',
+      { coins: 175, xp: 140, ecoPoints: 250, diamonds: 1 }, '🐢'
+    ),
+  ],
+});
+
 const LESSON_STAGES = [
   { type: 'story', icon: 'book-outline', prefix: 'Mistério' },
   { type: 'clue', icon: 'search-outline', prefix: 'Pista' },
@@ -259,25 +492,47 @@ export const BIOME_CHAPTERS = BIOME_BLUEPRINTS.map((blueprint, index) => {
   const order = index + 1;
   const startLevel = 1 + index * 26;
   const endLevel = startLevel + 24;
-  const treeNodes = blueprint.tree.map((item) => ({
-    id: `${blueprint.id}-${item.key}`,
-    name: item.name,
-    category: item.category,
-    icon: item.icon,
-    description: item.description,
-    cost: item.cost,
-    pps: item.pps,
-    tapBonus: item.tapBonus,
-    requiredLocalLevel: item.level,
-    requiredNodeId: item.parent ? `${blueprint.id}-${item.parent}` : null,
-    collectionItem: {
-      id: `${blueprint.id}-node-${item.key}`,
+  const treeNodes = blueprint.tree.map((item) => {
+    const mapLayer = item.category === 'producer'
+      ? 'flora'
+      : item.category === 'consumer' ? 'fauna' : 'environment';
+    const mapDescription = item.category === 'producer'
+      ? `${item.name} passa a ocupar e sustentar novas áreas do mapa.`
+      : item.category === 'consumer'
+        ? `${item.name} pode surgir no mapa quando habitat, horário e clima forem adequados.`
+        : `${item.name} ativa uma nova transformação ambiental observável no mapa.`;
+    return {
+      id: `${blueprint.id}-${item.key}`,
       name: item.name,
-      emoji: item.icon,
-      category: item.category === 'producer' ? 'flora' : item.category === 'consumer' ? 'fauna' : 'discovery',
-      biomeId: blueprint.id,
+      category: item.category,
+      icon: item.icon,
       description: item.description,
-    },
+      mapDescription,
+      effects: {
+        worldTags: [`${blueprint.id}:${item.key}`],
+        mapLayer,
+        ecoPointsPerSecond: item.pps,
+        scanPowerBonus: item.tapBonus,
+      },
+      cost: item.cost,
+      pps: item.pps,
+      tapBonus: item.tapBonus,
+      requiredLocalLevel: item.level,
+      requiredNodeId: item.parent ? `${blueprint.id}-${item.parent}` : null,
+      collectionItem: {
+        id: `${blueprint.id}-node-${item.key}`,
+        name: item.name,
+        emoji: item.icon,
+        category: item.category === 'producer' ? 'flora' : item.category === 'consumer' ? 'fauna' : 'discovery',
+        biomeId: blueprint.id,
+        description: item.description,
+      },
+    };
+  });
+  const careChallenges = (CARE_BLUEPRINTS[blueprint.id] || []).map((challenge) => ({
+    ...challenge,
+    reward: { ...challenge.reward },
+    collectionItem: { ...challenge.collectionItem },
   }));
   return {
     id: blueprint.id,
@@ -297,12 +552,14 @@ export const BIOME_CHAPTERS = BIOME_BLUEPRINTS.map((blueprint, index) => {
       endLocalLevel: topicIndex * 5 + 5,
     })),
     treeNodes,
+    careChallenges,
     mainMission: {
       id: `${blueprint.id}-missao-principal`,
       title: `Restaurar ${blueprint.name}`,
-      description: 'Conclua os 25 níveis e todos os atributos da árvore de evolução.',
+      description: 'Conclua os 25 níveis, forme todas as conexões da Teia da Vida e estabilize os desafios de cuidado.',
       requiredLessons: 25,
       requiredNodes: treeNodes.length,
+      requiredCare: careChallenges.length,
       reward: { coins: 500 + index * 100, xp: 300 + index * 40, diamonds: 8 },
     },
   };
@@ -361,17 +618,19 @@ export const SHOP_ITEMS = [
 
 export const MISSION_TEMPLATES = [
   { id: 'diaria-2-licoes', period: 'daily', title: 'Duas descobertas', description: 'Conclua 2 níveis hoje.', metric: 'lessonsCompleted', target: 2, reward: { coins: 45, xp: 35, fuel: 1 } },
-  { id: 'diaria-25-toques', period: 'daily', title: 'Energia do ecossistema', description: 'Toque 25 vezes na árvore ativa.', metric: 'ecosystemTaps', target: 25, reward: { coins: 35, ecoPoints: 60 } },
-  { id: 'diaria-1-no', period: 'daily', title: 'Nova conexão', description: 'Compre 1 atributo da árvore.', metric: 'nodesUnlocked', target: 1, reward: { diamonds: 2, xp: 45 } },
+  { id: 'diaria-25-toques', period: 'daily', title: 'Pistas de campo', description: 'Faça 8 varreduras e colete pistas no mapa.', metric: 'fieldScans', target: 8, reward: { coins: 35, ecoPoints: 60 } },
+  { id: 'diaria-1-no', period: 'daily', title: 'Nova conexão', description: 'Forme 1 nova conexão na Teia da Vida.', metric: 'nodesUnlocked', target: 1, reward: { diamonds: 2, xp: 45 } },
   { id: 'semanal-12-licoes', period: 'weekly', title: 'Pesquisador da semana', description: 'Conclua 12 níveis nesta semana.', metric: 'lessonsCompleted', target: 12, reward: { coins: 220, xp: 180, diamonds: 4 } },
-  { id: 'semanal-4-nos', period: 'weekly', title: 'Ecossistema em expansão', description: 'Compre 4 atributos de árvores.', metric: 'nodesUnlocked', target: 4, reward: { coins: 180, fuel: 3, boost: { type: 'coinBoost', durationMinutes: 30 } } },
+  { id: 'semanal-4-nos', period: 'weekly', title: 'Teia em expansão', description: 'Forme 4 conexões nas Teias da Vida.', metric: 'nodesUnlocked', target: 4, reward: { coins: 180, fuel: 3, boost: { type: 'coinBoost', durationMinutes: 30 } } },
   { id: 'semanal-5-missoes', period: 'weekly', title: 'Ritmo de explorador', description: 'Resgate 5 recompensas de missão.', metric: 'missionsClaimed', target: 5, reward: { diamonds: 6, xp: 240, boost: { type: 'xpBoost', durationMinutes: 30 } } },
+  { id: 'semanal-1-cuidado', period: 'weekly', title: 'Bioma em recuperação', description: 'Estabilize 1 desafio de cuidado ambiental.', metric: 'careChallengesResolved', target: 1, reward: { coins: 200, xp: 180, diamonds: 4, fuel: 2 } },
 ];
 
 export const getBiomeById = (id) => BIOME_CHAPTERS.find((biome) => biome.id === id) || null;
 export const getJourneyStepById = (id) => JOURNEY_STEPS.find((step) => step.id === id) || null;
 
 export default {
+  CARE_BLUEPRINTS,
   BIOME_CHAPTERS,
   JOURNEY_STEPS,
   SHOP_ITEMS,

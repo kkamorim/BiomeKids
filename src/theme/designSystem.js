@@ -1,47 +1,57 @@
 import { Platform } from 'react-native';
 
 export const palette = Object.freeze({
-  primary: '#58CC02',
-  primaryDark: '#3F9700',
-  primaryDeep: '#245C16',
-  primarySoft: '#DDF7C8',
-  secondary: '#1CB0F6',
-  secondaryDark: '#087FB5',
-  secondarySoft: '#DDF4FF',
+  // Caderno de campo: papel, tinta e pigmentos encontrados na paisagem.
+  paper: '#F4EEDC',
+  paperLight: '#FBF7EA',
+  ink: '#26352F',
+  moss: '#5F7849',
+  bark: '#75553B',
+  river: '#3F7180',
+  sun: '#D19A3B',
+  clay: '#B85E49',
 
-  background: '#F7FBF4',
-  backgroundMuted: '#EEF7E9',
-  backgroundWarm: '#FFF8E8',
-  surface: '#FFFFFF',
-  surfaceMuted: '#F3F7F0',
-  surfaceRaised: '#FFFFFF',
+  primary: '#5F7849',
+  primaryDark: '#435C36',
+  primaryDeep: '#293D2B',
+  primarySoft: '#DEE5CB',
+  secondary: '#3F7180',
+  secondaryDark: '#2B5662',
+  secondarySoft: '#DCE9E9',
 
-  text: '#20331F',
-  textStrong: '#152714',
-  textMuted: '#687A65',
-  textSubtle: '#8B9988',
-  inverseText: '#FFFFFF',
+  background: '#F4EEDC',
+  backgroundMuted: '#EBE3CF',
+  backgroundWarm: '#F5E7C8',
+  surface: '#FBF7EA',
+  surfaceMuted: '#EEE6D2',
+  surfaceRaised: '#FFFBEF',
 
-  border: '#DCE8D7',
-  borderStrong: '#C5D8BE',
-  divider: '#E8EFE4',
-  disabled: '#AEBBAA',
-  disabledSurface: '#E8EEE5',
+  text: '#26352F',
+  textStrong: '#17251F',
+  textMuted: '#657067',
+  textSubtle: '#898B7C',
+  inverseText: '#FFFBEF',
 
-  success: '#43A047',
-  warning: '#F5A623',
-  danger: '#E84B4B',
-  info: '#1CB0F6',
+  border: '#D2C7AB',
+  borderStrong: '#B7AA88',
+  divider: '#DED4BA',
+  disabled: '#A6A697',
+  disabledSurface: '#E4DDCB',
 
-  streak: '#FF8A1F',
-  coin: '#F2B91F',
-  diamond: '#1CB0F6',
-  heart: '#EF476F',
-  fuel: '#5ABF41',
+  success: '#587C46',
+  warning: '#D19A3B',
+  danger: '#B7564A',
+  info: '#3F7180',
 
-  forest: '#1B4332',
-  soil: '#6D4C32',
-  white: '#FFFFFF',
+  streak: '#D66D3D',
+  coin: '#C58C27',
+  diamond: '#3F8090',
+  heart: '#B9565D',
+  fuel: '#68884B',
+
+  forest: '#244235',
+  soil: '#75553B',
+  white: '#FFFBEF',
   black: '#000000',
   transparent: 'transparent',
 });
@@ -50,10 +60,10 @@ export const palette = Object.freeze({
 export const colors = palette;
 
 export const gradients = Object.freeze({
-  app: [palette.background, palette.backgroundMuted, palette.backgroundWarm],
-  forest: ['#F5FBEF', '#E4F5DC', '#FFF8E8'],
-  sky: ['#E9F8FF', '#F5FCF2', '#FFF9EA'],
-  primary: [palette.primary, '#70D91B'],
+  app: [palette.paperLight, palette.paper, palette.backgroundMuted],
+  forest: ['#F7F2E3', '#E8E5CF', '#DDE5CB'],
+  sky: ['#EFF3E9', '#E3ECE8', '#DCE9E9'],
+  primary: [palette.moss, palette.primaryDark],
 });
 
 export const spacing = Object.freeze({
@@ -69,12 +79,12 @@ export const spacing = Object.freeze({
 });
 
 export const radius = Object.freeze({
-  xs: 6,
-  sm: 10,
-  md: 14,
-  lg: 18,
-  xl: 24,
-  xxl: 32,
+  xs: 4,
+  sm: 7,
+  md: 10,
+  lg: 14,
+  xl: 18,
+  xxl: 24,
   pill: 999,
   round: 999,
 });
@@ -82,7 +92,7 @@ export const radius = Object.freeze({
 export const layout = Object.freeze({
   maxContentWidth: 720,
   pageHorizontalPadding: spacing.lg,
-  bottomNavHeight: 82,
+  bottomNavHeight: 80,
 });
 
 export function alpha(color, opacity = 1) {
@@ -113,11 +123,11 @@ export function alpha(color, opacity = 1) {
 }
 
 export function createShadow({
-  color = palette.forest,
-  opacity = 0.12,
-  y = 4,
-  blur = 10,
-  elevation = 4,
+  color = palette.ink,
+  opacity = 0.1,
+  y = 3,
+  blur = 8,
+  elevation = 3,
 } = {}) {
   if (Platform.OS === 'web') {
     return {
@@ -135,9 +145,9 @@ export function createShadow({
 }
 
 export const shadows = Object.freeze({
-  sm: createShadow({ opacity: 0.08, y: 2, blur: 6, elevation: 2 }),
-  md: createShadow({ opacity: 0.12, y: 4, blur: 12, elevation: 4 }),
-  lg: createShadow({ opacity: 0.16, y: 8, blur: 22, elevation: 8 }),
+  sm: createShadow({ opacity: 0.06, y: 1, blur: 4, elevation: 1 }),
+  md: createShadow({ opacity: 0.09, y: 3, blur: 9, elevation: 3 }),
+  lg: createShadow({ opacity: 0.12, y: 6, blur: 16, elevation: 6 }),
 });
 
 const designSystem = {

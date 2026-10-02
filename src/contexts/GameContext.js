@@ -20,14 +20,27 @@ import { secureStorage } from '../services/secureStorage';
 
 const GameContext = createContext(null);
 const STORAGE_KEY = 'biomekids_journey_state_v2';
-const SCHEMA_VERSION = 3;
+const SCHEMA_VERSION = 4;
 const MAX_OFFLINE_SECONDS = 8 * 60 * 60;
 const REQUIRED_LOCAL_LEVEL = 25;
-const EMPTY_PROGRESS = Object.freeze({ ecoPoints: 0, pps: 0, tapPower: 1, unlockedNodes: [] });
+const FIELD_DISCOVERY_REWARD = Object.freeze({ coins: 12, xp: 10, ecoPoints: 8 });
+const EMPTY_PROGRESS = Object.freeze({
+  ecoPoints: 0,
+  pps: 0,
+  tapPower: 1,
+  fieldScans: 0,
+  unlockedNodes: [],
+  observedNodes: [],
+  resolvedChallenges: [],
+});
 const DEFAULT_STATS = Object.freeze({
   lessonsCompleted: 0,
   correctAnswers: 0,
   incorrectAnswers: 0,
+  fieldScans: 0,
+  careChallengesResolved: 0,
+  fieldDiscoveries: 0,
+  // Mantido como alias para missões e saves anteriores ao schema 4.
   ecosystemTaps: 0,
   nodesUnlocked: 0,
   shopPurchases: 0,
@@ -108,7 +121,12 @@ function buildBiomeProgress(saved = {}) {
       ecoPoints: positive(value.ecoPoints ?? value.accumulatedPoints),
       pps: positive(value.pps ?? value.pointsPerSecond),
       tapPower: Math.max(1, positive(value.tapPower, 1)),
+      fieldScans: Math.floor(positive(value.fieldScans ?? value.scans)),
       unlockedNodes: uniqueStrings(value.unlockedNodes),
+      observedNodes: uniqueStrings(value.observedNodes ?? value.discoveredNodes),
+      resolvedChallenges: uniqueStrings(
+        value.resolvedChallenges ?? value.completedCareChallenges
+      ),
     };
   });
   return result;
@@ -161,6 +179,9 @@ function mergeSavedState(saved, now = Date.now()) {
   const savedMissionCycles = saved.missionCycles && typeof saved.missionCycles === 'object'
     ? saved.missionCycles
     : null;
+  const savedStats = saved.stats && typeof saved.stats === 'object' && !Array.isArray(saved.stats)
+    ? saved.stats
+    : {};
   return {
     ...base,
     schemaVersion: SCHEMA_VERSION,
@@ -200,7 +221,14 @@ function mergeSavedState(saved, now = Date.now()) {
         ? cleanMap(savedMissionCycles.weeklyBaseline)
         : { ...missionProgress },
     },
-    stats: { ...DEFAULT_STATS, ...(saved.stats || {}) },
+    stats: {
+      ...DEFAULT_STATS,
+      ...savedStats,
+      fieldScans: Math.floor(positive(savedStats.fieldScans ?? savedStats.ecosystemTaps)),
+      ecosystemTaps: Math.floor(positive(savedStats.ecosystemTaps ?? savedStats.fieldScans)),
+      careChallengesResolved: Math.floor(positive(savedStats.careChallengesResolved)),
+      fieldDiscoveries: Math.floor(positive(savedStats.fieldDiscoveries)),
+    },
     lastSavedAt: timestamp(saved.lastSavedAt ?? saved.lastSavedTime, now),
   };
 }
@@ -268,14 +296,15 @@ function rewardValue(reward, ...keys) {
   return key ? positive(reward[key]) : 0;
 }
 
-function grantReward(state, reward = {}, now = Date.now()) {
+function grantReward(state, reward = {}, now = Date.now(), biomeId = state.activeBiomeId) {
   const active = multipliers(state, now);
   const coins = Math.round(rewardValue(reward, 'coins', 'coin') * active.coins);
   const xp = Math.round(rewardValue(reward, 'xp') * active.xp);
   const diamonds = Math.round(rewardValue(reward, 'diamonds', 'diamond'));
   const fuel = Math.round(rewardValue(reward, 'fuel'));
   const ecoPoints = rewardValue(reward, 'ecoPoints', 'ecosystemPoints');
-  const progress = state.biomeProgress[state.activeBiomeId] || { ...EMPTY_PROGRESS };
+  const targetBiomeId = biomeById(biomeId) ? biomeId : state.activeBiomeId;
+  const progress = state.biomeProgress[targetBiomeId] || { ...EMPTY_PROGRESS };
   let activeBoosts = applyBoost(cleanBoosts(state.activeBoosts, now), reward.boost, now);
   if (reward.coinBoostMinutes) activeBoosts = extendBoost(activeBoosts, 'coinsUntil', reward.coinBoostMinutes, now);
   if (reward.xpBoostMinutes) activeBoosts = extendBoost(activeBoosts, 'xpUntil', reward.xpBoostMinutes, now);
@@ -287,7 +316,7 @@ function grantReward(state, reward = {}, now = Date.now()) {
     xp: state.xp + xp,
     biomeProgress: ecoPoints > 0 ? {
       ...state.biomeProgress,
-      [state.activeBiomeId]: {
+      [targetBiomeId]: {
         ...progress,
         ecoPoints: positive(progress.ecoPoints) + ecoPoints,
       },
@@ -360,8 +389,14 @@ function itemKey(item) {
 }
 
 function addCollection(collection, item) {
-  if (!item || collection.some((entry) => itemKey(entry) === itemKey(item))) return collection;
-  return [...collection, item];
+  const items = Array.isArray(collection) ? collection : [];
+  if (!item) return items;
+  const index = items.findIndex((entry) => itemKey(entry) === itemKey(item));
+  if (index < 0) return [...items, item];
+  if (typeof items[index] !== 'object' || typeof item !== 'object') return items;
+  const merged = { ...items[index], ...item };
+  if (JSON.stringify(merged) === JSON.stringify(items[index])) return items;
+  return items.map((entry, entryIndex) => (entryIndex === index ? merged : entry));
 }
 
 function bumpMetrics(progress, groups) {
@@ -391,8 +426,22 @@ function treeComplete(state, biomeId) {
   return nodes.length > 0 && nodes.every((node) => unlocked.includes(node.id));
 }
 
+function careChallengesFor(biome) {
+  if (Array.isArray(biome?.careChallenges)) return biome.careChallenges;
+  if (Array.isArray(biome?.challenges)) return biome.challenges;
+  return [];
+}
+
+function careComplete(state, biomeId) {
+  const challenges = careChallengesFor(biomeById(biomeId));
+  const resolved = state.biomeProgress[biomeId]?.resolvedChallenges || [];
+  return challenges.every((challenge) => resolved.includes(challenge.id));
+}
+
 const biomeReady = (state, biomeId) => (
-  localLevel(state, biomeId) >= REQUIRED_LOCAL_LEVEL && treeComplete(state, biomeId)
+  localLevel(state, biomeId) >= REQUIRED_LOCAL_LEVEL
+  && treeComplete(state, biomeId)
+  && careComplete(state, biomeId)
 );
 
 function biomeUnlocked(state, biomeId) {
@@ -568,7 +617,7 @@ export function GameProvider({ children }) {
     };
   }), [commit]);
 
-  const tapEcosystem = useCallback((biomeId) => commit((current) => {
+  const scanEcosystem = useCallback((biomeId) => commit((current) => {
     if (!biomeUnlocked(current, biomeId)) return { state: current, result: false };
     const progress = current.biomeProgress[biomeId] || { ...EMPTY_PROGRESS };
     const earned = Math.max(1, positive(progress.tapPower, 1));
@@ -577,14 +626,27 @@ export function GameProvider({ children }) {
         ...current,
         biomeProgress: {
           ...current.biomeProgress,
-          [biomeId]: { ...progress, ecoPoints: progress.ecoPoints + earned },
+          [biomeId]: {
+            ...progress,
+            ecoPoints: positive(progress.ecoPoints) + earned,
+            fieldScans: Math.floor(positive(progress.fieldScans)) + 1,
+          },
         },
         missionProgress: bumpMetrics(current.missionProgress, [
-          { names: ['ecosystemTaps', 'taps'] },
+          {
+            names: [
+              'fieldScans',
+              'ecosystemTaps',
+              'taps',
+              `${biomeId}:fieldScans`,
+              `${biomeId}:scans`,
+            ],
+          },
           { names: ['ecoPointsEarned'], amount: earned },
         ]),
         stats: {
           ...current.stats,
+          fieldScans: positive(current.stats.fieldScans) + 1,
           ecosystemTaps: positive(current.stats.ecosystemTaps) + 1,
           totalEcoPointsEarned: positive(current.stats.totalEcoPointsEarned) + earned,
         },
@@ -593,6 +655,9 @@ export function GameProvider({ children }) {
       result: earned,
     };
   }), [commit]);
+
+  // Compatibilidade com as telas e missões anteriores ao schema 4.
+  const tapEcosystem = scanEcosystem;
 
   const buyEvolutionNode = useCallback((biomeId, nodeId) => commit((current) => {
     const biome = biomeById(biomeId);
@@ -623,13 +688,133 @@ export function GameProvider({ children }) {
             unlockedNodes: [...progress.unlockedNodes, node.id],
           },
         },
-        collection: addCollection(current.collection, node.collectionItem),
         missionProgress: bumpMetrics(current.missionProgress, [
           { names: ['nodesUnlocked', 'evolutionNodes'] },
           { names: [`${biomeId}:nodes`] },
         ]),
         stats: { ...current.stats, nodesUnlocked: positive(current.stats.nodesUnlocked) + 1 },
         lastSavedAt: Date.now(),
+      },
+      result: true,
+    };
+  }), [commit]);
+
+  const observeEvolutionNode = useCallback((biomeId, nodeId) => commit((current) => {
+    const biome = biomeById(biomeId);
+    const node = biome?.treeNodes?.find((entry) => entry.id === nodeId);
+    const progress = current.biomeProgress[biomeId];
+    if (!node || !progress || !biomeUnlocked(current, biomeId)) {
+      return { state: current, result: false };
+    }
+    if (!progress.unlockedNodes.includes(node.id)) {
+      return { state: current, result: false };
+    }
+    const observedNodes = uniqueStrings(progress.observedNodes);
+    if (observedNodes.includes(node.id)) {
+      return { state: current, result: true };
+    }
+
+    const now = Date.now();
+    const reward = node.observationReward || node.discoveryReward || FIELD_DISCOVERY_REWARD;
+    const collectionItem = node.collectionItem ? {
+      ...node.collectionItem,
+      discoveryState: 'discovered',
+      source: 'field-observation',
+      sourceId: node.id,
+      discoveredAt: now,
+    } : null;
+    const rewarded = grantReward(current, reward, now, biomeId);
+    const rewardedProgress = rewarded.biomeProgress[biomeId] || progress;
+    return {
+      state: {
+        ...rewarded,
+        biomeProgress: {
+          ...rewarded.biomeProgress,
+          [biomeId]: {
+            ...rewardedProgress,
+            observedNodes: [...observedNodes, node.id],
+          },
+        },
+        collection: addCollection(rewarded.collection, collectionItem),
+        missionProgress: bumpMetrics(rewarded.missionProgress, [
+          { names: ['fieldDiscoveries', 'nodesObserved', 'observedNodes'] },
+          { names: [`${biomeId}:fieldDiscoveries`, `${biomeId}:observedNodes`] },
+        ]),
+        stats: {
+          ...rewarded.stats,
+          fieldDiscoveries: positive(rewarded.stats.fieldDiscoveries) + 1,
+        },
+        lastSavedAt: now,
+      },
+      result: true,
+    };
+  }), [commit]);
+
+  const resolveCareChallenge = useCallback((biomeId, challengeId) => commit((current) => {
+    const biome = biomeById(biomeId);
+    const challenge = careChallengesFor(biome).find((entry) => entry.id === challengeId);
+    const progress = current.biomeProgress[biomeId];
+    if (!challenge || !progress || !biomeUnlocked(current, biomeId)) {
+      return { state: current, result: false };
+    }
+    const resolvedChallenges = uniqueStrings(progress.resolvedChallenges);
+    if (resolvedChallenges.includes(challenge.id)) {
+      return { state: current, result: true };
+    }
+
+    const requiredLevel = positive(
+      challenge.requiredLocalLevel ?? challenge.requiredLevel ?? challenge.level
+    );
+    const requiredNodes = uniqueStrings([
+      challenge.requiredNodeId,
+      ...(Array.isArray(challenge.requiredNodeIds) ? challenge.requiredNodeIds : []),
+      ...(Array.isArray(challenge.requiredNodes) ? challenge.requiredNodes : []),
+    ]);
+    const requiredScans = positive(
+      challenge.requiredScans ?? challenge.scansRequired ?? challenge.fieldScans
+    );
+    if (localLevel(current, biomeId) < requiredLevel) {
+      return { state: current, result: false };
+    }
+    if (requiredNodes.some((nodeId) => !progress.unlockedNodes.includes(nodeId))) {
+      return { state: current, result: false };
+    }
+    if (positive(progress.fieldScans) < requiredScans) {
+      return { state: current, result: false };
+    }
+
+    const now = Date.now();
+    const collectionItem = challenge.collectionItem ? {
+      ...challenge.collectionItem,
+      discoveryState: 'discovered',
+      source: 'care-challenge',
+      sourceId: challenge.id,
+      discoveredAt: now,
+    } : null;
+    const rewarded = grantReward(current, challenge.reward || {}, now, biomeId);
+    const rewardedProgress = rewarded.biomeProgress[biomeId] || progress;
+    return {
+      state: {
+        ...rewarded,
+        biomeProgress: {
+          ...rewarded.biomeProgress,
+          [biomeId]: {
+            ...rewardedProgress,
+            resolvedChallenges: [...resolvedChallenges, challenge.id],
+          },
+        },
+        collection: addCollection(rewarded.collection, collectionItem),
+        missionProgress: bumpMetrics(rewarded.missionProgress, [
+          { names: ['careChallengesResolved', 'careChallenges', 'resolvedChallenges'] },
+          { names: [`${biomeId}:careChallenges`, `${biomeId}:resolvedChallenges`] },
+          ...(collectionItem ? [{ names: ['fieldDiscoveries', `${biomeId}:fieldDiscoveries`] }] : []),
+        ]),
+        stats: {
+          ...rewarded.stats,
+          careChallengesResolved: positive(rewarded.stats.careChallengesResolved) + 1,
+          fieldDiscoveries: positive(rewarded.stats.fieldDiscoveries) + (collectionItem ? 1 : 0),
+        },
+        lastSavedAt: now,
       },
       result: true,
     };
@@ -865,13 +1050,27 @@ export function GameProvider({ children }) {
     (sum, progress) => sum + (progress.unlockedNodes?.length || 0),
     0
   );
-  const totalJourneyObjectives = JOURNEY_STEPS.length + totalEvolutionNodes;
-  const completedJourneyObjectives = gameState.completedSteps.length + completedEvolutionNodes;
+  const totalCareChallenges = BIOME_CHAPTERS.reduce(
+    (sum, biome) => sum + careChallengesFor(biome).length,
+    0
+  );
+  const completedCareChallenges = BIOME_CHAPTERS.reduce((sum, biome) => {
+    const resolved = gameState.biomeProgress[biome.id]?.resolvedChallenges || [];
+    return sum + careChallengesFor(biome)
+      .filter((challenge) => resolved.includes(challenge.id)).length;
+  }, 0);
+  const totalJourneyObjectives = JOURNEY_STEPS.length + totalEvolutionNodes + totalCareChallenges;
+  const completedJourneyObjectives = gameState.completedSteps.length
+    + completedEvolutionNodes
+    + completedCareChallenges;
   const journeyProgress = {
     completed: completedJourneyObjectives,
     total: totalJourneyObjectives,
     lessonsAndTransitions: gameState.completedSteps.length,
     evolutionNodes: completedEvolutionNodes,
+    careChallenges: completedCareChallenges,
+    careChallengesResolved: completedCareChallenges,
+    careChallengesTotal: totalCareChallenges,
     percent: totalJourneyObjectives
       ? Math.min(100, (completedJourneyObjectives / totalJourneyObjectives) * 100)
       : 100,
@@ -904,8 +1103,11 @@ export function GameProvider({ children }) {
 
     completeLesson,
     answerIncorrect,
+    scanEcosystem,
     tapEcosystem,
     buyEvolutionNode,
+    observeEvolutionNode,
+    resolveCareChallenge,
     purchaseShopItem,
     claimMission,
     selectBiome,
@@ -936,8 +1138,11 @@ export function GameProvider({ children }) {
     unlockedBiomes,
     completeLesson,
     answerIncorrect,
+    scanEcosystem,
     tapEcosystem,
     buyEvolutionNode,
+    observeEvolutionNode,
+    resolveCareChallenge,
     purchaseShopItem,
     claimMission,
     selectBiome,

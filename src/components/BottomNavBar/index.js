@@ -10,43 +10,44 @@ import styles from './styles';
 const NAV_ITEMS = [
   {
     key: 'journey',
-    label: 'Trilha',
+    label: 'Estudos',
     route: 'Journey',
-    icon: 'map-outline',
-    activeIcon: 'map',
+    icon: 'school-outline',
+    activeIcon: 'school',
     aliases: ['Trilha', 'Journey', 'Estudos'],
   },
   {
     key: 'evolution',
-    label: 'Árvore',
+    label: 'Teia',
     route: 'Evolution',
     icon: 'git-network-outline',
     activeIcon: 'git-network',
-    aliases: ['Árvore', 'Arvore', 'Evolution'],
+    aliases: ['Árvore', 'Arvore', 'Evolution', 'Teia'],
+  },
+  {
+    key: 'expedition',
+    label: 'Expedição',
+    route: 'Expedition',
+    icon: 'compass-outline',
+    activeIcon: 'compass',
+    aliases: ['Expedição', 'Expedicao', 'Expedition', 'Mapa'],
+    featured: true,
   },
   {
     key: 'missions',
     label: 'Missões',
     route: 'Missoes',
-    icon: 'ribbon-outline',
-    activeIcon: 'ribbon',
+    icon: 'flag-outline',
+    activeIcon: 'flag',
     aliases: ['Missões', 'Missoes'],
   },
   {
     key: 'collection',
-    label: 'Coleção',
+    label: 'Caderno',
     route: 'Colecao',
-    icon: 'paw-outline',
-    activeIcon: 'paw',
-    aliases: ['Coleção', 'Colecao'],
-  },
-  {
-    key: 'shop',
-    label: 'Loja',
-    route: 'Loja',
-    icon: 'storefront-outline',
-    activeIcon: 'storefront',
-    aliases: ['Loja'],
+    icon: 'library-outline',
+    activeIcon: 'library',
+    aliases: ['Coleção', 'Colecao', 'Caderno'],
   },
 ];
 
@@ -93,15 +94,29 @@ export default function BottomNavBar({ activeTab = 'Journey', style }) {
               onPress={() => navigateTo(item, active)}
               style={({ pressed }) => [
                 styles.navItem,
+                item.featured && styles.navItemFeatured,
                 active && styles.navItemActive,
                 pressed && styles.navItemPressed,
               ]}
             >
-              <View style={[styles.iconCircle, active && styles.iconCircleActive]}>
+              <View
+                style={[
+                  styles.iconFrame,
+                  item.featured && styles.iconFrameFeatured,
+                  active && !item.featured && styles.iconFrameActive,
+                  active && item.featured && styles.iconFrameFeaturedActive,
+                ]}
+              >
                 <Ionicons
                   name={active ? item.activeIcon : item.icon}
-                  size={21}
-                  color={active ? palette.inverseText : palette.textMuted}
+                  size={item.featured ? 26 : 21}
+                  color={
+                    item.featured
+                      ? palette.inverseText
+                      : active
+                        ? palette.primaryDeep
+                        : palette.textMuted
+                  }
                 />
                 {badgeCount > 0 ? (
                   <View style={styles.badge}>
@@ -112,11 +127,22 @@ export default function BottomNavBar({ activeTab = 'Journey', style }) {
                 ) : null}
               </View>
               <Text
-                style={[styles.navText, active && styles.navTextActive]}
+                style={[
+                  styles.navText,
+                  item.featured && styles.navTextFeatured,
+                  active && styles.navTextActive,
+                ]}
                 numberOfLines={1}
               >
                 {item.label}
               </Text>
+              <View
+                style={[
+                  styles.activeMark,
+                  active && styles.activeMarkVisible,
+                  active && item.featured && styles.activeMarkFeatured,
+                ]}
+              />
             </Pressable>
           );
         })}

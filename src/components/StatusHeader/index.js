@@ -1,16 +1,35 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useGame } from '../../contexts/GameContext';
 import {
   alpha,
   layout,
   palette,
   radius,
-  shadows,
   spacing,
 } from '../../theme/designSystem';
+
+const ROUTE_METRICS = Object.freeze({
+  Journey: ['streak', 'hearts', 'fuel'],
+  Lesson: ['hearts', 'fuel'],
+  Evolution: ['ecoPoints', 'coins'],
+  Expedition: ['ecoPoints', 'coins', 'diamonds'],
+  Missoes: ['streak', 'fuel'],
+  Colecao: ['collection', 'coins'],
+  Loja: ['coins', 'diamonds'],
+  Biomas: ['streak', 'collection'],
+});
+
+const VARIANT_METRICS = Object.freeze({
+  study: ['streak', 'hearts', 'fuel'],
+  expedition: ['ecoPoints', 'coins', 'diamonds'],
+  economy: ['coins', 'diamonds'],
+  collection: ['collection', 'coins'],
+});
+
+const DEFAULT_METRICS = ['streak', 'coins', 'diamonds'];
 
 function firstDefined(...values) {
   return values.find((value) => value !== undefined && value !== null);
@@ -30,29 +49,61 @@ function formatMetric(value) {
   return String(Math.floor(value));
 }
 
-function MetricChip({ icon, color, value, label }) {
+function MetricContent({ icon, color, value }) {
   return (
-    <View
-      accessible
-      accessibilityLabel={label + ': ' + value}
-      style={[styles.metricChip, { backgroundColor: alpha(color, 0.1) }]}
-    >
+    <>
       <Ionicons name={icon} size={17} color={color} />
       <Text style={styles.metricValue} numberOfLines={1}>
         {formatMetric(value)}
       </Text>
+    </>
+  );
+}
+
+function MetricChip({ icon, color, value, label, onPress }) {
+  const accessibilityLabel = label + ': ' + formatMetric(value);
+
+  if (onPress) {
+    return (
+      <Pressable
+        accessibilityRole={'button'}
+        accessibilityLabel={accessibilityLabel + '. Abrir loja'}
+        hitSlop={4}
+        onPress={onPress}
+        style={({ pressed }) => [
+          styles.metricChip,
+          { borderBottomColor: alpha(color, 0.48) },
+          pressed && styles.metricChipPressed,
+        ]}
+      >
+        <MetricContent icon={icon} color={color} value={value} />
+      </Pressable>
+    );
+  }
+
+  return (
+    <View
+      accessible
+      accessibilityLabel={accessibilityLabel}
+      style={[styles.metricChip, { borderBottomColor: alpha(color, 0.48) }]}
+    >
+      <MetricContent icon={icon} color={color} value={value} />
     </View>
   );
 }
 
-function HeaderButton({ icon, color, label, onPress }) {
+function HeaderButton({ icon, color, label, onPress, emphasis = false }) {
   return (
     <Pressable
       accessibilityRole={'button'}
       accessibilityLabel={label}
       hitSlop={8}
       onPress={onPress}
-      style={({ pressed }) => [styles.headerButton, pressed && styles.headerButtonPressed]}
+      style={({ pressed }) => [
+        styles.headerButton,
+        emphasis && styles.headerButtonEmphasis,
+        pressed && styles.headerButtonPressed,
+      ]}
     >
       <Ionicons name={icon} size={21} color={color} />
     </Pressable>
@@ -62,12 +113,18 @@ function HeaderButton({ icon, color, label, onPress }) {
 export function StatusHeader({
   showProfile = true,
   showBiomes = false,
+  showShop = true,
   onProfilePress,
   onBiomesPress,
+  onShopPress,
   profileRoute = 'Perfil',
   biomesRoute = 'Biomas',
+  shopRoute = 'Loja',
   profileAccessibilityLabel = 'Abrir perfil',
   biomesAccessibilityLabel = 'Escolher bioma',
+  shopAccessibilityLabel = 'Abrir posto de suprimentos',
+  variant,
+  metrics: requestedMetrics,
   streak,
   coins,
   diamonds,
@@ -76,49 +133,86 @@ export function StatusHeader({
   style,
 }) {
   const navigation = useNavigation();
+  const route = useRoute();
   const game = useGame();
   const state = game?.gameState || game || {};
+  const routeName = route?.name;
 
-  const metrics = [
-    {
+  const openProfile = onProfilePress || (() => navigation.navigate(profileRoute));
+  const openBiomes = onBiomesPress || (() => navigation.navigate(biomesRoute));
+  const openShop = onShopPress || (() => navigation.navigate(shopRoute));
+
+  const metricDefinitions = {
+    streak: {
       key: 'streak',
       label: 'Sequência',
       icon: 'flame',
       color: palette.streak,
       value: firstDefined(streak, state.dailyStreak, state.streak, 0),
     },
-    {
+    coins: {
       key: 'coins',
       label: 'Moedas',
       icon: 'cash',
       color: palette.coin,
       value: firstDefined(coins, game?.coins, state.coins, 0),
+      onPress: openShop,
     },
-    {
+    diamonds: {
       key: 'diamonds',
       label: 'Diamantes',
       icon: 'diamond',
       color: palette.diamond,
       value: firstDefined(diamonds, state.diamonds, state.gems, state.crystals, 0),
+      onPress: openShop,
     },
-    {
+    hearts: {
       key: 'hearts',
       label: 'Corações',
       icon: 'heart',
       color: palette.heart,
       value: firstDefined(hearts, state.hearts, state.lives, 5),
     },
-    {
+    fuel: {
       key: 'fuel',
       label: 'Combustível',
       icon: 'flash',
       color: palette.fuel,
       value: firstDefined(fuel, state.fuel, state.energy, 5),
     },
-  ];
+    ecoPoints: {
+      key: 'ecoPoints',
+      label: 'Pontos ecológicos',
+      icon: 'leaf',
+      color: palette.moss,
+      value: firstDefined(
+        game?.activeBiomeProgress?.ecoPoints,
+        state.biomeProgress?.[state.activeBiomeId]?.ecoPoints,
+        0
+      ),
+    },
+    collection: {
+      key: 'collection',
+      label: 'Registros no caderno',
+      icon: 'library',
+      color: palette.bark,
+      value: Array.isArray(state.collection) ? state.collection.length : 0,
+    },
+  };
 
-  const openProfile = onProfilePress || (() => navigation.navigate(profileRoute));
-  const openBiomes = onBiomesPress || (() => navigation.navigate(biomesRoute));
+  const resolvedMetricRequest = Array.isArray(requestedMetrics)
+    ? requestedMetrics
+    : VARIANT_METRICS[variant] || ROUTE_METRICS[routeName] || DEFAULT_METRICS;
+  const visibleMetrics = resolvedMetricRequest
+    .map((metric) => {
+      if (typeof metric === 'string') return metricDefinitions[metric];
+      if (!metric || typeof metric !== 'object') return null;
+      return {
+        ...(metricDefinitions[metric.key] || {}),
+        ...metric,
+      };
+    })
+    .filter((metric) => metric?.key);
 
   return (
     <View style={[styles.outer, style]}>
@@ -139,10 +233,20 @@ export function StatusHeader({
           contentContainerStyle={styles.metrics}
           style={styles.metricsScroll}
         >
-          {metrics.map((metric) => (
+          {visibleMetrics.map((metric) => (
             <MetricChip key={metric.key} {...metric} />
           ))}
         </ScrollView>
+
+        {showShop && routeName !== shopRoute ? (
+          <HeaderButton
+            icon={'storefront-outline'}
+            color={palette.bark}
+            label={shopAccessibilityLabel}
+            onPress={openShop}
+            emphasis
+          />
+        ) : null}
 
         {showProfile ? (
           <HeaderButton
@@ -163,20 +267,19 @@ const styles = StyleSheet.create({
     maxWidth: layout.maxContentWidth,
     alignSelf: 'center',
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.xs,
+    paddingTop: spacing.xxs,
     paddingBottom: spacing.sm,
   },
   container: {
-    minHeight: 48,
+    minHeight: 46,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
-    padding: spacing.xs,
-    borderRadius: radius.xl,
-    borderWidth: 1,
-    borderColor: alpha(palette.borderStrong, 0.9),
-    backgroundColor: alpha(palette.surface, 0.94),
-    ...shadows.sm,
+    gap: spacing.xs,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.xxs,
+    borderBottomWidth: 1,
+    borderBottomColor: alpha(palette.borderStrong, 0.82),
+    backgroundColor: alpha(palette.paperLight, 0.68),
   },
   metricsScroll: {
     flex: 1,
@@ -185,36 +288,45 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.xs,
+    gap: spacing.xxs,
     paddingHorizontal: spacing.xxs,
   },
   metricChip: {
-    minWidth: 45,
+    minWidth: 44,
     minHeight: 34,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.xs,
     paddingHorizontal: spacing.sm,
-    borderRadius: radius.pill,
+    borderBottomWidth: 2,
+    borderRadius: radius.xs,
+    backgroundColor: alpha(palette.surface, 0.54),
+  },
+  metricChipPressed: {
+    backgroundColor: palette.surfaceMuted,
   },
   metricValue: {
     maxWidth: 54,
     color: palette.text,
     fontSize: 12,
-    fontWeight: '900',
+    fontWeight: '800',
     fontVariant: ['tabular-nums'],
   },
   headerButton: {
-    width: 38,
-    height: 38,
+    width: 36,
+    height: 36,
     flexShrink: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: radius.pill,
+    borderRadius: radius.md,
     borderWidth: 1,
     borderColor: palette.border,
-    backgroundColor: palette.surface,
+    backgroundColor: alpha(palette.surface, 0.58),
+  },
+  headerButtonEmphasis: {
+    borderColor: alpha(palette.bark, 0.34),
+    backgroundColor: alpha(palette.backgroundWarm, 0.78),
   },
   headerButtonPressed: {
     opacity: 0.72,
